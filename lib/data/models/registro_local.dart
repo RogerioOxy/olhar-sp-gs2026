@@ -1,5 +1,6 @@
 import 'territorio.dart';
 
+/// Representa o relato salvo no aparelho, associado a um distrito.
 class Ocorrencia {
   const Ocorrencia({
     required this.id,
@@ -42,6 +43,7 @@ class Ocorrencia {
   }
 }
 
+/// Centraliza limites ajustáveis e suas faixas permitidas.
 class Limiares {
   const Limiares({
     this.picoPercentual = 20,
@@ -109,6 +111,7 @@ class Limiares {
 
 enum DecisaoHumana { vistoriar, monitorar, descartar }
 
+/// Liga a escolha humana aos valores do alerta naquele momento.
 class RegistroDecisao {
   const RegistroDecisao(this.decisao, this.em, this.assinatura);
 

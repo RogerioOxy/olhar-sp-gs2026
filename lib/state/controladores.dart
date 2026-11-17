@@ -27,6 +27,7 @@ mixin _NotificaSeguro on ChangeNotifier {
   }
 }
 
+/// Compartilha preferências e só atualiza a memória após gravar.
 class PreferenciasController extends ChangeNotifier with _NotificaSeguro {
   PreferenciasController(this._armazenamento) {
     _ler();
@@ -110,6 +111,7 @@ class PreferenciasController extends ChangeNotifier with _NotificaSeguro {
     return r != null && r.assinatura == a.assinatura ? r : null;
   }
 
+  /// Persiste apenas a decisão humana; não envia ordens a equipes ou serviços externos.
   Future<void> registrarDecisao(Alerta alerta, DecisaoHumana decisao, {DateTime? agora}) async {
     final novas = {...decisoes, alerta.id: RegistroDecisao(decisao, agora ?? DateTime.now(), alerta.assinatura)};
     await _armazenamento.gravarJson(
@@ -127,6 +129,7 @@ class PreferenciasController extends ChangeNotifier with _NotificaSeguro {
   }
 }
 
+/// Carrega a base e prepara análises compartilhadas pelas telas.
 class TerritorioController extends ChangeNotifier with _NotificaSeguro {
   TerritorioController(this._repositorio);
 
@@ -165,6 +168,7 @@ class TerritorioController extends ChangeNotifier with _NotificaSeguro {
   }
 }
 
+/// Mantém dados disponíveis durante a tentativa de atualização pela rede.
 class ClimaController extends ChangeNotifier with _NotificaSeguro {
   ClimaController(this._servico);
 
@@ -184,6 +188,7 @@ class ClimaController extends ChangeNotifier with _NotificaSeguro {
     await iniciar();
   }
 
+  /// Mostra primeiro o cache ou o pacote e depois tenta buscar dados atuais.
   Future<void> iniciar() async {
     clima = _servico.lerCache() ?? await _servico.lerPacote();
     estado = clima == null ? EstadoCarga.carregando : EstadoCarga.pronto;
@@ -191,6 +196,7 @@ class ClimaController extends ChangeNotifier with _NotificaSeguro {
     await atualizar();
   }
 
+  /// Evita consultas simultâneas e ignora respostas de uma geração anterior.
   Future<void> atualizar() async {
     if (atualizando) return;
     final geracao = _geracao;
@@ -220,6 +226,7 @@ class ClimaController extends ChangeNotifier with _NotificaSeguro {
   }
 }
 
+/// Prepara os relatos para armazenamento local antes de avisar as telas.
 class OcorrenciasController extends ChangeNotifier with _NotificaSeguro {
   OcorrenciasController(this._armazenamento) {
     _ler();
@@ -236,6 +243,7 @@ class OcorrenciasController extends ChangeNotifier with _NotificaSeguro {
     ocorrencias.sort((a, b) => b.criadaEm.compareTo(a.criadaEm));
   }
 
+  /// Remove padrões pessoais e arredonda o horário antes de persistir o relato.
   Future<Ocorrencia> registrar({
     required String distritoId,
     required Categoria categoria,
@@ -277,6 +285,7 @@ class OcorrenciasController extends ChangeNotifier with _NotificaSeguro {
   );
 }
 
+/// Recalcula alertas quando uma das fontes compartilhadas muda.
 class AlertasController extends ChangeNotifier with _NotificaSeguro {
   AlertasController({
     required this.territorio,

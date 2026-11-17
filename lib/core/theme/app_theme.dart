@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Padroniza distâncias para manter consistência entre telas.
 class AppEspaco {
   static const xs = 4.0;
   static const sm = 8.0;
@@ -11,12 +12,14 @@ class AppEspaco {
   static const quebraTablet = 600.0;
 }
 
+/// Centraliza os arredondamentos usados nos componentes.
 class AppRaio {
   static const sm = 8.0;
   static const md = 14.0;
   static const lg = 20.0;
 }
 
+/// Reúne a paleta para facilitar ajustes visuais.
 class AppCores {
   static const verdeZeladoria = Color(0xFF0B5D52);
   static const verdeEscuro = Color(0xFF063D36);
@@ -36,6 +39,7 @@ class AppCores {
 }
 
 @immutable
+/// Estende o tema com cores específicas dos indicadores.
 class CoresDoPainel extends ThemeExtension<CoresDoPainel> {
   const CoresDoPainel({
     required this.serieReal,
@@ -114,6 +118,7 @@ const _painelContraste = CoresDoPainel(
   grade: Colors.black54,
 );
 
+/// Monta os temas a partir de uma base comum.
 class AppTheme {
   static ThemeData _base(ColorScheme esquema, CoresDoPainel painel, {bool contraste = false}) {
     final texto = Typography.material2021(platform: TargetPlatform.android).black.apply(

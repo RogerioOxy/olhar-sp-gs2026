@@ -9,6 +9,7 @@ List<double> somaRegistrados(List<PrevisaoDistrito> ps) {
   ];
 }
 
+/// Mantém o total ausente quando algum distrito ainda não tem previsão.
 List<double?> somaPrevistos(List<PrevisaoDistrito> ps) {
   if (ps.isEmpty) return const [];
   final n = ps.first.previstosHistorico.length;
@@ -22,6 +23,7 @@ List<double?> somaPrevistos(List<PrevisaoDistrito> ps) {
 
 List<T> ultimos<T>(List<T> l, int k) => l.length <= k ? l : l.sublist(l.length - k);
 
+/// Agrupa janelas de chuva sem misturar histórico e previsão.
 class ResumoClima {
   const ResumoClima({
     required this.chuvaProximos3,

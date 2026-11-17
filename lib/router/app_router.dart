@@ -16,6 +16,7 @@ import '../features/paineis/paineis_tela.dart';
 import '../features/shell/casca.dart';
 import '../state/controladores.dart';
 
+/// Centraliza nomes para que as telas naveguem sem repetir caminhos.
 class Rotas {
   static const consentimento = 'consentimento';
   static const inicio = 'inicio';
@@ -33,6 +34,7 @@ class Rotas {
   static const sobreDados = 'sobreDados';
 }
 
+/// Reavalia o consentimento ao mudar preferências e preserva as pilhas das abas.
 GoRouter criarRouter(PreferenciasController preferencias) {
   return GoRouter(
     initialLocation: '/inicio',

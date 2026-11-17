@@ -7,6 +7,7 @@ import '../../core/widgets/estados.dart';
 import '../../router/app_router.dart';
 import '../../state/controladores.dart';
 
+/// Reúne as abas e mostra a quantidade de alertas novos na navegação.
 class Casca extends StatelessWidget {
   const Casca({super.key, required this.navegacao});
 

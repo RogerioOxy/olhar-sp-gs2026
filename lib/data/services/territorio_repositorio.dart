@@ -6,6 +6,7 @@ import '../models/territorio.dart';
 
 typedef LeitorDeAsset = Future<String> Function(String caminho);
 
+/// Lê a base empacotada sem depender de um servidor.
 class TerritorioRepositorio {
   TerritorioRepositorio({LeitorDeAsset? leitor}) : _leitor = leitor ?? rootBundle.loadString;
 
@@ -13,6 +14,7 @@ class TerritorioRepositorio {
 
   final LeitorDeAsset _leitor;
 
+  /// Converte o arquivo local no modelo usado pelos cálculos.
   Future<Territorio> carregar() async {
     final bruto = await _leitor(caminho);
     return Territorio.fromJson(jsonDecode(bruto) as Map<String, dynamic>);

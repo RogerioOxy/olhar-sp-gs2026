@@ -11,6 +11,7 @@ import 'data/services/territorio_repositorio.dart';
 import 'router/app_router.dart';
 import 'state/controladores.dart';
 
+/// Inicializa os plugins antes de abrir o armazenamento usado pelo aplicativo.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final armazenamento = await ArmazenamentoLocal.abrir();
@@ -23,6 +24,7 @@ Future<void> main() async {
   );
 }
 
+/// Recebe dependências que também podem ser substituídas nos testes.
 class ZeladoriaApp extends StatefulWidget {
   const ZeladoriaApp({
     super.key,
@@ -41,6 +43,7 @@ class ZeladoriaApp extends StatefulWidget {
   State<ZeladoriaApp> createState() => _ZeladoriaAppState();
 }
 
+/// Mantém os controladores globais expostos pelo provider e seu ciclo de vida.
 class _ZeladoriaAppState extends State<ZeladoriaApp> with WidgetsBindingObserver {
   late final PreferenciasController _preferencias;
   late final TerritorioController _territorio;

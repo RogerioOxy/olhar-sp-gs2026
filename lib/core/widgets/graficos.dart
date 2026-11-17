@@ -45,6 +45,7 @@ class GraficoLinha extends StatelessWidget {
     final tema = Theme.of(context);
     final painel = CoresDoPainel.de(context);
     final estiloEixo = tema.textTheme.labelSmall!.copyWith(color: tema.colorScheme.onSurfaceVariant);
+    // Usa a descrição como resumo falado das linhas e da legenda.
     return Semantics(
       container: true,
       label: descricao,
@@ -105,6 +106,7 @@ class Legenda extends StatelessWidget {
   }
 }
 
+/// Isola o desenho no canvas para reutilizar a apresentação do gráfico.
 class _PintorAmostra extends CustomPainter {
   _PintorAmostra(this.cor, this.tracejada);
 
@@ -131,6 +133,7 @@ class _PintorAmostra extends CustomPainter {
   bool shouldRepaint(covariant _PintorAmostra old) => old.cor != cor || old.tracejada != tracejada;
 }
 
+/// Isola o desenho no canvas para reutilizar a apresentação do gráfico.
 class _PintorLinha extends CustomPainter {
   _PintorLinha({
     required this.series,
@@ -324,6 +327,7 @@ class GraficoBarras extends StatelessWidget {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final maior = maximo ?? itens.map((i) => i.valor).fold<double>(0, math.max);
+    // Lê a descrição do conjunto em vez de anunciar cada barra separada.
     return Semantics(
       container: true,
       label: descricao,
@@ -390,6 +394,7 @@ class GraficoColunas extends StatelessWidget {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final maior = valores.fold<double>(0, math.max);
+    // Resume as colunas em uma descrição para quem não vê o desenho.
     return Semantics(
       container: true,
       label: descricao,

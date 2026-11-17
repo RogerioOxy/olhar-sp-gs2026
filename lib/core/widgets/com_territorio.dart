@@ -6,6 +6,7 @@ import '../../state/controladores.dart';
 import '../textos.dart';
 import 'estados.dart';
 
+/// Mostra a carga ou o erro antes de montar o conteúdo do território.
 class ComTerritorio extends StatelessWidget {
   const ComTerritorio({super.key, required this.builder});
 

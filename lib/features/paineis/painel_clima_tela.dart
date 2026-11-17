@@ -43,6 +43,7 @@ class PainelClimaTela extends StatelessWidget {
   }
 }
 
+/// Combina histórico e previsão do clima nos indicadores e gráficos.
 class _Conteudo extends StatelessWidget {
   const _Conteudo({required this.clima, required this.controle, required this.limiar});
 

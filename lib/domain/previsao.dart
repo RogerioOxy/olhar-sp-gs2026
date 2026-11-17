@@ -4,6 +4,7 @@ import '../data/models/territorio.dart';
 
 enum Tendencia { alta, estavel, queda }
 
+/// Compara cada mês com a média geral para representar a sazonalidade.
 class IndiceSazonal {
   const IndiceSazonal(this.porMes);
 
@@ -11,6 +12,7 @@ class IndiceSazonal {
 
   double de(DateTime mes) => porMes[mes.month] ?? 1.0;
 
+  /// Usa apenas meses anteriores ao corte para não incluir o alvo no cálculo.
   static IndiceSazonal calcular(Territorio t, {required int ate}) {
     final totais = List<double>.filled(ate, 0);
     for (final d in t.distritos) {
@@ -33,6 +35,7 @@ class IndiceSazonal {
   }
 }
 
+/// Guarda previsão e valor real do mesmo mês para medir o erro.
 class PontoBacktest {
   const PontoBacktest(this.indice, this.previsto, this.real);
 
@@ -43,19 +46,23 @@ class PontoBacktest {
   double get erro => real - previsto;
 }
 
+/// Reúne medidas de erro que ajudam a avaliar a previsão.
 class ResultadoBacktest {
   const ResultadoBacktest(this.pontos);
 
   final List<PontoBacktest> pontos;
 
+  /// MAE é a média dos erros absolutos, na mesma unidade dos registros.
   double get mae => pontos.isEmpty
       ? 0
       : pontos.map((p) => p.erro.abs()).reduce((a, b) => a + b) / pontos.length;
 
+  /// RMSE é a raiz da média dos erros ao quadrado e dá mais peso a erros grandes.
   double get rmse => pontos.isEmpty
       ? 0
       : math.sqrt(pontos.map((p) => p.erro * p.erro).reduce((a, b) => a + b) / pontos.length);
 
+  /// MAPE mede o erro relativo médio e exclui valores reais zero para evitar divisão por zero.
   double get mape {
     final validos = pontos.where((p) => p.real > 0).toList();
     if (validos.isEmpty) return 0;
@@ -63,6 +70,7 @@ class ResultadoBacktest {
   }
 }
 
+/// Mantém previsão, histórico e erro juntos para explicar o resultado.
 class PrevisaoDistrito {
   const PrevisaoDistrito({
     required this.distrito,
@@ -93,6 +101,7 @@ class PrevisaoDistrito {
   }
 }
 
+/// Combina o nível recente com a sazonalidade calculada no passado.
 class ModeloPrevisao {
   ModeloPrevisao(this.territorio, {this.janelaNivel = 3, this.mesesBacktest = 6});
 
@@ -111,6 +120,7 @@ class ModeloPrevisao {
   DateTime mesDoIndice(int i) =>
       i < n ? territorio.meses[i] : mesSeguinte(mesDoIndice(i - 1));
 
+  /// Retira a sazonalidade dos meses recentes e aplica a do alvo; exige ao menos doze meses.
   double? prever(Distrito d, int alvo) {
     if (alvo < 12 || alvo < janelaNivel) return null;
     final idx = _indice(alvo);
@@ -123,6 +133,7 @@ class ModeloPrevisao {
     return nivel * idx.de(mesDoIndice(alvo));
   }
 
+  /// Simula previsões no passado usando somente informações anteriores a cada alvo.
   ResultadoBacktest backtest(Distrito d, {required int ultimoExcluido}) {
     final pontos = <PontoBacktest>[];
     for (var i = ultimoExcluido - mesesBacktest; i < ultimoExcluido; i++) {
@@ -132,6 +143,7 @@ class ModeloPrevisao {
     return ResultadoBacktest(pontos);
   }
 
+  /// Retira a sazonalidade antes de estimar a direção da série.
   double tendencia(Distrito d, {int janela = 12}) {
     final inicio = math.max(0, n - janela);
     final idx = _indice(n);
@@ -142,6 +154,7 @@ class ModeloPrevisao {
     return inclinacaoRelativa(ys);
   }
 
+  /// Reserva o último mês para comparação e usa 1,28 RMSE como faixa do próximo mês.
   PrevisaoDistrito paraDistrito(Distrito d) {
     final ultimo = n - 1;
     final bt = backtest(d, ultimoExcluido: ultimo);
@@ -162,6 +175,7 @@ class ModeloPrevisao {
   List<PrevisaoDistrito> todos() => territorio.distritos.map(paraDistrito).toList();
 }
 
+/// Divide a inclinação da regressão linear pela média para comparar escalas diferentes.
 double inclinacaoRelativa(List<double> ys) {
   if (ys.length < 2) return 0;
   final nn = ys.length;
@@ -177,6 +191,7 @@ double inclinacaoRelativa(List<double> ys) {
   return (num / den) / my;
 }
 
+/// Resume os erros dos distritos para a visão geral.
 class ResumoBacktest {
   const ResumoBacktest({required this.maeMedio, required this.mapeGeral, required this.meses});
 

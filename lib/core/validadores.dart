@@ -11,6 +11,7 @@ String? validarObrigatorio(Object? v) {
   return null;
 }
 
+/// Exige tamanho adequado e uma palavra para evitar relatos sem informação.
 String? validarDescricao(String? v) {
   final t = (v ?? '').trim();
   if (t.isEmpty) return Textos.erroDescricaoVazia;
@@ -28,6 +29,7 @@ String? validarReferencia(String? v) {
 
 String? avisoDadoPessoal(String? v) => contemDadoPessoal(v ?? '') ? Textos.avisoDadoPessoal : null;
 
+/// Aceita apenas inteiros dentro dos limites definidos para o campo.
 String? validarInteiroNaFaixa(String? v, int min, int max) {
   final t = (v ?? '').trim();
   if (t.isEmpty) return Textos.erroObrigatorio;

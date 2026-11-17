@@ -38,6 +38,7 @@ PICOS = {("grajau", 23): 1.55, ("penha", 23): 1.40}
 QUEDAS_REGISTRO = {("cidade-tiradentes", 23): 0.6}
 
 
+# Usa sorteio direto para médias pequenas e aproximação normal para médias maiores.
 def poisson(rng, lam):
     if lam < 50:
         limite = math.exp(-lam)
@@ -50,6 +51,7 @@ def poisson(rng, lam):
     return max(0, int(round(rng.gauss(lam, math.sqrt(lam)))))
 
 
+# Simula tentativas pequenas e aproxima as maiores, mantendo o resultado entre zero e n.
 def binomial(rng, n, p):
     if n < 60:
         return sum(1 for _ in range(n) if rng.random() < p)
@@ -57,6 +59,7 @@ def binomial(rng, n, p):
     return max(0, min(n, int(round(rng.gauss(media, math.sqrt(media * (1 - p)))))))
 
 
+# Avança mês a mês, incluindo a troca de ano.
 def meses():
     ano, mes = INICIO
     saida = []
@@ -68,6 +71,7 @@ def meses():
     return saida
 
 
+# Varia os pesos por faixa e normaliza antes do arredondamento.
 def perfil_categorias(rng, faixa):
     base = {"buraco": 0.27, "iluminacao": 0.2, "poda": 0.18, "entulho": 0.17, "boca_de_lobo": 0.18}
     if faixa == "baixa":
@@ -82,6 +86,7 @@ def perfil_categorias(rng, faixa):
     return {c: round(v / total, 3) for c, v in pesos.items()}
 
 
+# Usa uma semente fixa para reproduzir a base sintética em novas execuções.
 def gerar():
     rng = random.Random(SEMENTE)
     lista_meses = meses()

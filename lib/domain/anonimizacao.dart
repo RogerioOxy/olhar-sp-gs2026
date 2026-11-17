@@ -14,6 +14,7 @@ final _nomeProprio = RegExp(
 );
 final _espacos = RegExp(r'\s+');
 
+/// Substitui padrões comuns de dados pessoais. As expressões não garantem remoção de todo dado sensível.
 String anonimizar(String texto, {required String marcador}) {
   var s = texto
       .replaceAll(_email, marcador)
@@ -27,6 +28,7 @@ String anonimizar(String texto, {required String marcador}) {
   return s;
 }
 
+/// Usa os mesmos padrões da remoção para avisar durante o preenchimento.
 bool contemDadoPessoal(String texto) =>
     _email.hasMatch(texto) ||
     _cpf.hasMatch(texto) ||
@@ -36,9 +38,11 @@ bool contemDadoPessoal(String texto) =>
     _logradouroNumero.hasMatch(texto) ||
     _nomeProprio.hasMatch(texto);
 
+/// Gera um identificador aleatório sem usar nome ou documento do cidadão.
 String gerarIdAnonimo([Random? aleatorio]) {
   final r = aleatorio ?? Random.secure();
   return List.generate(12, (_) => r.nextInt(16).toRadixString(16)).join();
 }
 
+/// Remove minutos e segundos para reduzir a precisão temporal do relato.
 DateTime arredondarParaHora(DateTime d) => DateTime(d.year, d.month, d.day, d.hour);

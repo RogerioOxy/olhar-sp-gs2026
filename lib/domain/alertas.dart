@@ -10,6 +10,7 @@ enum Confianca { baixa, media, alta }
 
 enum Prioridade { atencao, alta }
 
+/// Reúne os valores que permitem conferir o motivo do alerta.
 class Alerta {
   const Alerta({
     required this.id,
@@ -27,12 +28,14 @@ class Alerta {
   final Prioridade prioridade;
   final Map<String, num> valores;
 
+  /// Ignora limiares na assinatura e ordena valores para reconhecer a mesma evidência.
   String get assinatura {
     final chaves = valores.keys.where((k) => !k.startsWith('limiar')).toList()..sort();
     return [id, for (final k in chaves) '$k=${valores[k]}'].join('|');
   }
 }
 
+/// MAPE até 8% indica alta confiança e até 15%, média. Desvio menor que dois RMSE reduz um nível.
 Confianca confiancaPorErro(double mape, double desvioEmRmse) {
   var nivel = mape <= 0.08
       ? Confianca.alta
@@ -45,6 +48,7 @@ Confianca confiancaPorErro(double mape, double desvioEmRmse) {
   return nivel;
 }
 
+/// Aplica os limiares e organiza sinais para avaliação humana.
 class MotorAlertas {
   const MotorAlertas({
     required this.territorio,
@@ -64,6 +68,7 @@ class MotorAlertas {
   final Clima? clima;
   final DateTime agora;
 
+  /// Ordena por prioridade, confiança e identificador para manter a lista previsível.
   List<Alerta> gerar() {
     final saida = <Alerta>[
       ..._demanda(),
@@ -81,6 +86,7 @@ class MotorAlertas {
     return saida;
   }
 
+  /// Compara o desvio percentual com os limites de pico e queda definidos pelo usuário.
   Iterable<Alerta> _demanda() sync* {
     for (final p in previsoes) {
       final rmse = p.backtest.rmse;
@@ -116,6 +122,7 @@ class MotorAlertas {
     }
   }
 
+  /// Exige três dias e o limiar de chuva; seleciona até três distritos com ao menos 20% de bocas de lobo.
   Iterable<Alerta> _chuva() sync* {
     final c = clima;
     if (c == null) return;
@@ -145,6 +152,7 @@ class MotorAlertas {
     }
   }
 
+  /// Agrupa relatos dos últimos sete dias; cinco relatos elevam a confiança para média.
   Iterable<Alerta> _cidadao() sync* {
     final corte = agora.subtract(const Duration(days: 7));
     final recentes = ocorrencias.where((o) => o.criadaEm.isAfter(corte));
@@ -178,6 +186,7 @@ class MotorAlertas {
     }
   }
 
+  /// Sinaliza estimativas acima do limiar, sempre com confiança baixa por depender de amostra.
   Iterable<Alerta> _subRegistro() sync* {
     for (final s in equidade.subRegistroTodos()) {
       if (s.estimativa * 100 < limiares.subRegistroPercentual) continue;

@@ -10,12 +10,14 @@ import 'armazenamento_local.dart';
 
 enum FalhaClima { semConexao, tempoEsgotado, servidor, formato }
 
+/// Classifica falhas da consulta para orientar a mensagem da interface.
 class ClimaExcecao implements Exception {
   const ClimaExcecao(this.falha);
 
   final FalhaClima falha;
 }
 
+/// Separa rede, cache e pacote para permitir consulta sem conexão.
 class ClimaServico {
   ClimaServico({
     required this.armazenamento,
@@ -45,6 +47,7 @@ class ClimaServico {
     'timezone': 'America/Sao_Paulo',
   });
 
+  /// Limita a espera e distingue falhas de conexão, servidor e formato.
   Future<(Clima, Map<String, dynamic>)> buscarNaRede() async {
     final http.Response resposta;
     try {
@@ -66,6 +69,7 @@ class ClimaServico {
     }
   }
 
+  /// Guarda também a data da coleta; falha ao gravar retorna falso sem descartar a resposta da rede.
   Future<bool> salvarCache(Clima clima, Map<String, dynamic> corpo) async {
     try {
       await armazenamento.gravarJson(

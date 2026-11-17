@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import '../data/models/territorio.dart';
 import 'previsao.dart';
 
+/// Agrupa taxas por renda para comparar populações de tamanhos diferentes.
 class SerieFaixa {
   const SerieFaixa({
     required this.faixa,
@@ -19,6 +20,7 @@ class SerieFaixa {
   final List<double> subRegistro;
 }
 
+/// Expõe a estimativa e sua margem para evitar uma leitura de certeza.
 class SubRegistroDistrito {
   const SubRegistroDistrito({
     required this.distrito,
@@ -37,6 +39,7 @@ class SubRegistroDistrito {
   final double margem;
 }
 
+/// Compara atendimentos por população entre as faixas de renda.
 class IndicadorSocial {
   const IndicadorSocial({
     required this.serieDiferenca,
@@ -61,6 +64,7 @@ class IndicadorSocial {
 
 double limitar01(double v) => v < 0 ? 0 : (v > 1 ? 1 : v);
 
+/// Usa população e vistorias para investigar diferenças nos registros.
 class AnaliseEquidade {
   AnaliseEquidade(this.territorio, {this.janela = 3});
 
@@ -69,6 +73,7 @@ class AnaliseEquidade {
 
   int get n => territorio.meses.length;
 
+  /// Converte totais em taxas por dez mil habitantes para comparar as faixas.
   SerieFaixa serie(FaixaRenda faixa) {
     final ds = territorio.distritos.where((d) => d.faixaRenda == faixa).toList();
     final pop = ds.fold<int>(0, (s, d) => s + d.populacao);
@@ -95,6 +100,7 @@ class AnaliseEquidade {
 
   Map<FaixaRenda, SerieFaixa> series() => {for (final f in FaixaRenda.values) f: serie(f)};
 
+  /// Subtrai a taxa da baixa renda da alta e suaviza o valor atual pela janela final.
   IndicadorSocial indicadorSocial() {
     final baixa = serie(FaixaRenda.baixa);
     final alta = serie(FaixaRenda.alta);
@@ -118,6 +124,7 @@ class AnaliseEquidade {
     );
   }
 
+  /// Expande achados pela fração vistoriada; estima a parcela sem registro e limita entre zero e um.
   SubRegistroDistrito subRegistro(Distrito d) {
     final ini = n - janela < 0 ? 0 : n - janela;
     var achados = 0;
@@ -128,6 +135,7 @@ class AnaliseEquidade {
     }
     final estimados = achados / territorio.amostraVistoria;
     final p = estimados == 0 ? 0.0 : limitar01(reg / estimados);
+    // A margem usa 1,96 vezes o erro padrão da proporção; sem achados, assume margem máxima.
     final margem = achados == 0 ? 1.0 : 1.96 * math.sqrt(p * (1 - p) / achados);
     return SubRegistroDistrito(
       distrito: d,

@@ -292,6 +292,7 @@ class TendenciaEtiqueta extends StatelessWidget {
   }
 }
 
+/// Lembra que o alerta precisa de avaliação antes de qualquer ação externa.
 class AvisoDecisaoHumana extends StatelessWidget {
   const AvisoDecisaoHumana({super.key, this.compacto = false});
 

@@ -57,6 +57,7 @@ class _AlertaDetalheTelaState extends State<AlertaDetalheTela> {
   }
 }
 
+/// Mostra as evidências do alerta e consulta a decisão salva para ele.
 class _Detalhe extends StatelessWidget {
   const _Detalhe({required this.alerta, required this.controle});
 
@@ -218,6 +219,7 @@ class _GraficoEvidencia extends StatelessWidget {
   }
 }
 
+/// Registra uma escolha local; os botões não executam serviços de zeladoria.
 class _DecisaoHumana extends StatelessWidget {
   const _DecisaoHumana({required this.alerta, required this.atual});
 

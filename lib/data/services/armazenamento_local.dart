@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Distingue falha de persistência para a tela não anunciar sucesso.
 class FalhaDeGravacao implements Exception {
   const FalhaDeGravacao(this.chave);
 
   final String chave;
 }
 
+/// Concentra a persistência no aparelho e o tratamento de JSON inválido.
 class ArmazenamentoLocal {
   ArmazenamentoLocal(this._prefs);
 
@@ -30,10 +32,12 @@ class ArmazenamentoLocal {
     return v is String ? v : null;
   }
 
+  /// Confere o retorno da gravação antes de permitir confirmação na interface.
   Future<void> gravarTexto(String chave, String valor) async {
     if (!await _prefs.setString(chave, valor)) throw FalhaDeGravacao(chave);
   }
 
+  /// Trata JSON inválido como ausência para permitir os valores padrão.
   Object? json(String chave) {
     final bruto = texto(chave);
     if (bruto == null) return null;

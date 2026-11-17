@@ -1,3 +1,4 @@
+/// Agrupa milhares com ponto para a leitura em português.
 String inteiro(num v) {
   final n = v.round();
   final negativo = n < 0;
@@ -10,6 +11,7 @@ String inteiro(num v) {
   return '${negativo ? '-' : ''}$buf';
 }
 
+/// Usa vírgula decimal e preserva o sinal de valores entre menos um e zero.
 String decimal(num v, [int casas = 1]) {
   final s = v.toStringAsFixed(casas);
   final partes = s.split('.');

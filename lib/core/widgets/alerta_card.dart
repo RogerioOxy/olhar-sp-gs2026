@@ -28,6 +28,7 @@ class AlertaCard extends StatelessWidget {
     final decisao = context.select<PreferenciasController, Object?>((p) => p.decisaoPara(alerta));
     final titulo = Textos.alertaTitulo(alerta.tipo);
     final resumo = Textos.alertaResumo(alerta);
+    // Lê o alerta como um único botão, com resumo e ação de toque.
     return Semantics(
       button: true,
       onTap: onTap,

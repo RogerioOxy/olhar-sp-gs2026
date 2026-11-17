@@ -26,6 +26,7 @@ FaixaRenda faixaPorChave(String chave) => switch (chave) {
   _ => throw FormatException(chave),
 };
 
+/// Agrupa as séries e características usadas nas análises locais.
 class Distrito {
   const Distrito({
     required this.id,
@@ -71,6 +72,7 @@ class Distrito {
   }
 }
 
+/// Mantém meses e distritos na mesma base de análise.
 class Territorio {
   const Territorio({
     required this.meses,

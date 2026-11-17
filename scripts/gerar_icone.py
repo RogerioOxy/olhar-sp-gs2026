@@ -10,6 +10,7 @@ BRANCO = (255, 255, 255, 255)
 TAMANHOS = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
 
 
+# Desenha em escala quatro vezes maior e reduz com LANCZOS para suavizar bordas.
 def desenhar(lado):
     escala = 4
     s = lado * escala

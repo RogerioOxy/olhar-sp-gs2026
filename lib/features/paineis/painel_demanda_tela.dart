@@ -184,6 +184,7 @@ class _PainelDemandaTelaState extends State<PainelDemandaTela> {
   }
 }
 
+/// Simplifica a busca textual para reduzir diferenças de escrita.
 String normalizar(String s) {
   const de = 'áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ';
   const para = 'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC';

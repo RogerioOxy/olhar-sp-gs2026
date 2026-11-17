@@ -1,3 +1,4 @@
+/// Mantém as medidas diárias e aceita probabilidade de chuva ausente.
 class DiaClima {
   const DiaClima({
     required this.data,
@@ -16,6 +17,7 @@ class DiaClima {
 
 enum OrigemClima { rede, cache, pacote }
 
+/// Preserva origem e data da coleta para contextualizar dados antigos.
 class Clima {
   const Clima({
     required this.dias,
@@ -41,6 +43,7 @@ class Clima {
 
   DateTime get _diaDaColeta => DateTime(obtidoEm.year, obtidoEm.month, obtidoEm.day);
 
+  /// Limita o histórico é coleta para não transformar previsão antiga em observação.
   List<DiaClima> historico(DateTime hoje) {
     final h = DateTime(hoje.year, hoje.month, hoje.day);
     final limite = _diaDaColeta.isBefore(h) ? _diaDaColeta : h;
