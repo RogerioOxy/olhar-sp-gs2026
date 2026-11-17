@@ -234,7 +234,7 @@ class _LinhaDistrito extends StatelessWidget {
               ),
               const SizedBox(width: AppEspaco.sm),
               Etiqueta(
-                texto: comSinal(p.desvio * 100, (v) => '${decimal(v, 1)}%'),
+                texto: comSinal(p.desvio * 100, (v) => '${decimal((v * 10).truncate() / 10, 1)}%'),
                 cor: alto || baixo ? painel.alertaAlta : tema.colorScheme.onSurface,
                 fundo: alto || baixo ? painel.altaFundo : tema.colorScheme.surfaceContainerHigh,
               ),

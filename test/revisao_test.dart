@@ -99,6 +99,45 @@ void main() {
     expect(s, contains('Rua Alfa'));
     expect(contemDadoPessoal('meu nome é Maria Souza'), isTrue);
     expect(contemDadoPessoal('Poste apagado na Rua Alfa'), isFalse);
+    expect(anonimizar('Buraco na Rua 25 de Março', marcador: '[x]'), 'Buraco na Rua 25 de Março');
+    expect(anonimizar('Sou morador e vi o poste apagado', marcador: '[x]'), 'Sou morador e vi o poste apagado');
+    expect(anonimizar('Sou Morador do bairro', marcador: '[x]'), 'Sou Morador do bairro');
+  });
+
+  test('cache do clima com tipo errado é ignorado', () async {
+    SharedPreferences.setMockInitialValues({
+      ArmazenamentoLocal.chaveClima: jsonEncode({'salvoEm': 123, 'corpo': <String, dynamic>{}}),
+    });
+    final servico = ClimaServico(
+      armazenamento: await ArmazenamentoLocal.abrir(),
+      cliente: clienteOffline(),
+      leitorPacote: (_) async => jsonClimaPacote,
+    );
+    expect(servico.lerCache(), isNull);
+    expect(await servico.lerPacote(), isNotNull);
+  });
+
+  test('duas exclusões seguidas não ressuscitam ocorrência', () async {
+    SharedPreferences.setMockInitialValues({});
+    final c = OcorrenciasController(await ArmazenamentoLocal.abrir());
+    final a = await c.registrar(
+      distritoId: 'moema',
+      categoria: Categoria.poda,
+      descricao: 'galho caido na calcada',
+      referencia: '',
+      marcadorRemovido: '[x]',
+    );
+    final b = await c.registrar(
+      distritoId: 'moema',
+      categoria: Categoria.buraco,
+      descricao: 'buraco grande na via',
+      referencia: '',
+      marcadorRemovido: '[x]',
+    );
+    await Future.wait([c.remover(a.id), c.remover(b.id)]);
+    expect(c.ocorrencias, isEmpty);
+    final releitura = OcorrenciasController(await ArmazenamentoLocal.abrir());
+    expect(releitura.ocorrencias, isEmpty);
   });
 
   test('dados salvos com tipo errado não derrubam a leitura', () {
@@ -174,6 +213,9 @@ void main() {
     await tester.ensureVisible(card);
     await tester.pumpAndSettle();
     expect(tester.getSemantics(card), isSemantics(isButton: true, hasTapAction: true));
+    tester.semantics.tap(find.semantics.byLabel(RegExp(Textos.alertaTitulo(TipoAlerta.picoDemanda))).first);
+    await tester.pumpAndSettle();
+    expect(find.text(Textos.justificativaTitulo), findsOneWidget);
     handle.dispose();
   });
 

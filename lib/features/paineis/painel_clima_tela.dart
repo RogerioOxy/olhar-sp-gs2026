@@ -112,7 +112,9 @@ class _Conteudo extends StatelessWidget {
                 marcas: marcas,
                 cor: painel.serieAuxiliar,
                 corDestaque: painel.seriePrevista,
-                descricao: Textos.climaChuvaDescricao(r.chuvaUltimos7, r.chuvaProximos3, hist.length, prev.length),
+                descricao: r.previsaoCompleta
+                    ? Textos.climaChuvaDescricao(r.chuvaUltimos7, r.chuvaProximos3, hist.length, prev.length)
+                    : Textos.climaPrevisaoParcial(r.diasPrevistos),
               ),
               const SizedBox(height: AppEspaco.sm),
               Legenda(

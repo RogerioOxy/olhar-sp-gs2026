@@ -147,6 +147,7 @@ class MotorAlertas {
           'limiarMm': limiares.chuvaMm3Dias,
           'probMaxPct': prob,
           'bocaDeLoboPct': ((d.categorias[Categoria.bocaDeLobo] ?? 0) * 100).round(),
+          'inicioPrevisao': proximos.first.data.millisecondsSinceEpoch,
         },
       );
     }
@@ -181,6 +182,7 @@ class MotorAlertas {
           'limiar': limiares.ocorrencias7Dias,
           'categoriaPrincipal': principal.key.index,
           'qtdCategoriaPrincipal': principal.value,
+          'relatos': Object.hashAll([for (final o in entrada.value) o.id]..sort()),
         },
       );
     }

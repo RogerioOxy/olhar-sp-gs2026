@@ -14,6 +14,15 @@ import '../../state/controladores.dart';
 class AjustesTela extends StatelessWidget {
   const AjustesTela({super.key});
 
+  Future<void> _salvar(BuildContext context, Future<void> Function() acao) async {
+    final mensageiro = ScaffoldMessenger.of(context);
+    try {
+      await acao();
+    } on Object {
+      mensageiro.showSnackBar(SnackBar(content: Text(Textos.erroSalvar)));
+    }
+  }
+
   Future<void> _apagar(BuildContext context) async {
     final confirmou = await showDialog<bool>(
       context: context,
@@ -29,7 +38,7 @@ class AjustesTela extends StatelessWidget {
     );
     if (confirmou != true || !context.mounted) return;
     final ocorrencias = context.read<OcorrenciasController>();
-    final clima = context.read<ClimaController>();
+    final clima = context.read<ClimaController>()..invalidar();
     final mensageiro = ScaffoldMessenger.of(context);
     try {
       await context.read<PreferenciasController>().apagarTudo();
@@ -52,7 +61,7 @@ class AjustesTela extends StatelessWidget {
           Secao(
             titulo: Textos.ajustesPerfilTitulo,
             subtitulo: Textos.ajustesPerfilSubtitulo,
-            child: SeletorPerfil(valor: prefs.perfil, onChanged: prefs.definirPerfil),
+            child: SeletorPerfil(valor: prefs.perfil, onChanged: (p) => _salvar(context, () => prefs.definirPerfil(p))),
           ),
           Secao(
             titulo: Textos.ajustesDistritoTitulo,
@@ -62,7 +71,7 @@ class AjustesTela extends StatelessWidget {
               valor: prefs.meuDistritoId,
               obrigatorio: false,
               onChanged: (v) {
-                if (v != null) prefs.definirDistrito(v);
+                if (v != null) _salvar(context, () => prefs.definirDistrito(v));
               },
             ),
           ),
@@ -71,7 +80,7 @@ class AjustesTela extends StatelessWidget {
             child: RadioGroup<TemaEscolhido>(
               groupValue: prefs.tema,
               onChanged: (t) {
-                if (t != null) prefs.definirTema(t);
+                if (t != null) _salvar(context, () => prefs.definirTema(t));
               },
               child: Column(
                 children: [

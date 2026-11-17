@@ -234,7 +234,14 @@ class _RegistrarTelaState extends State<RegistrarTela> {
                             trailing: IconButton(
                               tooltip: Textos.apagarOcorrencia,
                               icon: const Icon(Icons.delete_outline),
-                              onPressed: () => context.read<OcorrenciasController>().remover(o.id),
+                              onPressed: () async {
+                                final mensageiro = ScaffoldMessenger.of(context);
+                                try {
+                                  await context.read<OcorrenciasController>().remover(o.id);
+                                } on Object {
+                                  mensageiro.showSnackBar(SnackBar(content: Text(Textos.erroSalvar)));
+                                }
+                              },
                             ),
                           ),
                       ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../data/models/clima.dart';
@@ -180,6 +182,11 @@ class ClimaController extends ChangeNotifier with _NotificaSeguro {
   bool atualizando = false;
   int _geracao = 0;
 
+  void invalidar() {
+    _geracao++;
+    atualizando = false;
+  }
+
   Future<void> reiniciar() async {
     _geracao++;
     clima = null;
@@ -260,18 +267,28 @@ class OcorrenciasController extends ChangeNotifier with _NotificaSeguro {
       referencia: anonimizar(referencia, marcador: marcadorRemovido),
       criadaEm: arredondarParaHora(agora ?? DateTime.now()),
     );
-    final novas = [o, ...ocorrencias];
-    await _salvar(novas);
-    ocorrencias = novas;
-    avisar();
+    await _emFila(() async {
+      final novas = [o, ...ocorrencias];
+      await _salvar(novas);
+      ocorrencias = novas;
+      avisar();
+    });
     return o;
   }
 
-  Future<void> remover(String id) async {
+  Future<void> remover(String id) => _emFila(() async {
     final novas = ocorrencias.where((o) => o.id != id).toList();
     await _salvar(novas);
     ocorrencias = novas;
     avisar();
+  });
+
+  Future<void> _fila = Future.value();
+
+  Future<void> _emFila(Future<void> Function() tarefa) {
+    final proxima = _fila.then((_) => tarefa());
+    _fila = proxima.catchError((_) {});
+    return proxima;
   }
 
   void recarregar() {
@@ -309,6 +326,7 @@ class AlertasController extends ChangeNotifier with _NotificaSeguro {
   List<Alerta> alertas = const [];
   Set<String> novos = const {};
   bool _primeiro = true;
+  Timer? _vencimento;
 
   List<ChangeNotifier> get _fontes => [territorio, clima, ocorrencias, preferencias];
 
@@ -342,7 +360,20 @@ class AlertasController extends ChangeNotifier with _NotificaSeguro {
     }
     novos = novos.intersection(ids);
     alertas = gerados;
+    _agendarVencimento();
     avisar();
+  }
+
+  void _agendarVencimento() {
+    _vencimento?.cancel();
+    final agora = _relogio();
+    final proximos = ocorrencias.ocorrencias
+        .map((o) => o.criadaEm.add(const Duration(days: 7)))
+        .where((v) => v.isAfter(agora))
+        .toList();
+    if (proximos.isEmpty) return;
+    proximos.sort();
+    _vencimento = Timer(proximos.first.difference(agora) + const Duration(seconds: 1), _recalcular);
   }
 
   Alerta? porId(String id) {
@@ -363,6 +394,7 @@ class AlertasController extends ChangeNotifier with _NotificaSeguro {
 
   @override
   void dispose() {
+    _vencimento?.cancel();
     for (final c in _fontes) {
       c.removeListener(_recalcular);
     }

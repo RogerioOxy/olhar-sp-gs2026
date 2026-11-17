@@ -94,7 +94,8 @@ class ClimaServico {
 
   Clima? _deEnvelope(Object? envelope, OrigemClima origem) {
     if (envelope is! Map<String, dynamic>) return null;
-    final salvoEm = DateTime.tryParse(envelope['salvoEm'] as String? ?? '');
+    final bruto = envelope['salvoEm'];
+    final salvoEm = bruto is String ? DateTime.tryParse(bruto) : null;
     final corpo = envelope['corpo'];
     if (salvoEm == null || corpo is! Map<String, dynamic>) return null;
     try {
