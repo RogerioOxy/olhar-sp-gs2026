@@ -2,6 +2,12 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+class FalhaDeGravacao implements Exception {
+  const FalhaDeGravacao(this.chave);
+
+  final String chave;
+}
+
 class ArmazenamentoLocal {
   ArmazenamentoLocal(this._prefs);
 
@@ -19,14 +25,17 @@ class ArmazenamentoLocal {
   static Future<ArmazenamentoLocal> abrir() async =>
       ArmazenamentoLocal(await SharedPreferences.getInstance());
 
-  String? texto(String chave) => _prefs.getString(chave);
+  String? texto(String chave) {
+    final v = _prefs.get(chave);
+    return v is String ? v : null;
+  }
 
-  Future<void> gravarTexto(String chave, String valor) => _prefs.setString(chave, valor);
-
-  Future<void> remover(String chave) => _prefs.remove(chave);
+  Future<void> gravarTexto(String chave, String valor) async {
+    if (!await _prefs.setString(chave, valor)) throw FalhaDeGravacao(chave);
+  }
 
   Object? json(String chave) {
-    final bruto = _prefs.getString(chave);
+    final bruto = texto(chave);
     if (bruto == null) return null;
     try {
       return jsonDecode(bruto);
@@ -35,8 +44,9 @@ class ArmazenamentoLocal {
     }
   }
 
-  Future<void> gravarJson(String chave, Object valor) =>
-      _prefs.setString(chave, jsonEncode(valor));
+  Future<void> gravarJson(String chave, Object valor) => gravarTexto(chave, jsonEncode(valor));
 
-  Future<void> apagarTudo() => _prefs.clear();
+  Future<void> apagarTudo() async {
+    if (!await _prefs.clear()) throw const FalhaDeGravacao('*');
+  }
 }

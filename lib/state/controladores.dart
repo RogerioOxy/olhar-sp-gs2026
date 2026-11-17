@@ -69,47 +69,54 @@ class PreferenciasController extends ChangeNotifier with _NotificaSeguro {
     required String? distritoId,
     DateTime? agora,
   }) async {
-    consentimentoEm = agora ?? DateTime.now();
-    this.perfil = perfil;
-    meuDistritoId = distritoId;
-    await _armazenamento.gravarTexto(ArmazenamentoLocal.chaveConsentimento, consentimentoEm!.toIso8601String());
+    final quando = agora ?? DateTime.now();
     await _armazenamento.gravarTexto(ArmazenamentoLocal.chavePerfil, perfil.name);
     if (distritoId != null) {
       await _armazenamento.gravarTexto(ArmazenamentoLocal.chaveDistrito, distritoId);
     }
+    await _armazenamento.gravarTexto(ArmazenamentoLocal.chaveConsentimento, quando.toIso8601String());
+    consentimentoEm = quando;
+    this.perfil = perfil;
+    meuDistritoId = distritoId;
     avisar();
   }
 
   Future<void> definirPerfil(Perfil novo) async {
-    perfil = novo;
     await _armazenamento.gravarTexto(ArmazenamentoLocal.chavePerfil, novo.name);
+    perfil = novo;
     avisar();
   }
 
   Future<void> definirDistrito(String id) async {
-    meuDistritoId = id;
     await _armazenamento.gravarTexto(ArmazenamentoLocal.chaveDistrito, id);
+    meuDistritoId = id;
     avisar();
   }
 
   Future<void> definirTema(TemaEscolhido novo) async {
-    tema = novo;
     await _armazenamento.gravarTexto(ArmazenamentoLocal.chaveTema, novo.name);
+    tema = novo;
     avisar();
   }
 
   Future<void> salvarLimiares(Limiares novos) async {
-    limiares = novos;
     await _armazenamento.gravarJson(ArmazenamentoLocal.chaveLimiares, novos.toJson());
+    limiares = novos;
     avisar();
   }
 
-  Future<void> registrarDecisao(String alertaId, DecisaoHumana decisao, {DateTime? agora}) async {
-    decisoes = {...decisoes, alertaId: RegistroDecisao(decisao, agora ?? DateTime.now())};
+  RegistroDecisao? decisaoPara(Alerta a) {
+    final r = decisoes[a.id];
+    return r != null && r.assinatura == a.assinatura ? r : null;
+  }
+
+  Future<void> registrarDecisao(Alerta alerta, DecisaoHumana decisao, {DateTime? agora}) async {
+    final novas = {...decisoes, alerta.id: RegistroDecisao(decisao, agora ?? DateTime.now(), alerta.assinatura)};
     await _armazenamento.gravarJson(
       ArmazenamentoLocal.chaveDecisoes,
-      decisoes.map((k, v) => MapEntry(k, v.toJson())),
+      novas.map((k, v) => MapEntry(k, v.toJson())),
     );
+    decisoes = novas;
     avisar();
   }
 
@@ -167,6 +174,15 @@ class ClimaController extends ChangeNotifier with _NotificaSeguro {
   Clima? clima;
   FalhaClima? ultimaFalha;
   bool atualizando = false;
+  int _geracao = 0;
+
+  Future<void> reiniciar() async {
+    _geracao++;
+    clima = null;
+    ultimaFalha = null;
+    atualizando = false;
+    await iniciar();
+  }
 
   Future<void> iniciar() async {
     clima = _servico.lerCache() ?? await _servico.lerPacote();
@@ -177,13 +193,18 @@ class ClimaController extends ChangeNotifier with _NotificaSeguro {
 
   Future<void> atualizar() async {
     if (atualizando) return;
+    final geracao = _geracao;
     atualizando = true;
     avisar();
     try {
-      clima = await _servico.buscarNaRede();
+      final (novo, corpo) = await _servico.buscarNaRede();
+      if (geracao != _geracao) return;
+      clima = novo;
       ultimaFalha = null;
       estado = EstadoCarga.pronto;
+      await _servico.salvarCache(novo, corpo);
     } on ClimaExcecao catch (e) {
+      if (geracao != _geracao) return;
       ultimaFalha = e.falha;
       if (clima == null) {
         estado = EstadoCarga.erro;
@@ -191,8 +212,10 @@ class ClimaController extends ChangeNotifier with _NotificaSeguro {
         clima = clima!.comOrigem(OrigemClima.cache);
       }
     } finally {
-      atualizando = false;
-      avisar();
+      if (geracao == _geracao) {
+        atualizando = false;
+        avisar();
+      }
     }
   }
 }
@@ -229,15 +252,17 @@ class OcorrenciasController extends ChangeNotifier with _NotificaSeguro {
       referencia: anonimizar(referencia, marcador: marcadorRemovido),
       criadaEm: arredondarParaHora(agora ?? DateTime.now()),
     );
-    ocorrencias = [o, ...ocorrencias];
-    await _salvar();
+    final novas = [o, ...ocorrencias];
+    await _salvar(novas);
+    ocorrencias = novas;
     avisar();
     return o;
   }
 
   Future<void> remover(String id) async {
-    ocorrencias = ocorrencias.where((o) => o.id != id).toList();
-    await _salvar();
+    final novas = ocorrencias.where((o) => o.id != id).toList();
+    await _salvar(novas);
+    ocorrencias = novas;
     avisar();
   }
 
@@ -246,9 +271,9 @@ class OcorrenciasController extends ChangeNotifier with _NotificaSeguro {
     avisar();
   }
 
-  Future<void> _salvar() => _armazenamento.gravarJson(
+  Future<void> _salvar(List<Ocorrencia> lista) => _armazenamento.gravarJson(
     ArmazenamentoLocal.chaveOcorrencias,
-    ocorrencias.map((o) => o.toJson()).toList(),
+    lista.map((o) => o.toJson()).toList(),
   );
 }
 
@@ -277,6 +302,8 @@ class AlertasController extends ChangeNotifier with _NotificaSeguro {
   bool _primeiro = true;
 
   List<ChangeNotifier> get _fontes => [territorio, clima, ocorrencias, preferencias];
+
+  void recalcular() => _recalcular();
 
   void _recalcular() {
     final t = territorio.territorio;

@@ -45,7 +45,7 @@ class ClimaServico {
     'timezone': 'America/Sao_Paulo',
   });
 
-  Future<Clima> buscarNaRede() async {
+  Future<(Clima, Map<String, dynamic>)> buscarNaRede() async {
     final http.Response resposta;
     try {
       resposta = await _cliente.get(uri).timeout(tempoLimite);
@@ -58,19 +58,24 @@ class ClimaServico {
     }
     if (resposta.statusCode != 200) throw const ClimaExcecao(FalhaClima.servidor);
     final agora = _relogio();
-    final Clima clima;
     try {
       final corpo = jsonDecode(utf8.decode(resposta.bodyBytes)) as Map<String, dynamic>;
-      clima = Clima.fromOpenMeteo(corpo, obtidoEm: agora, origem: OrigemClima.rede);
-      await armazenamento.gravarJson(ArmazenamentoLocal.chaveClima, {
-        'salvoEm': agora.toIso8601String(),
-        'corpo': corpo,
-      });
-    } on Object catch (e) {
-      if (e is ClimaExcecao) rethrow;
+      return (Clima.fromOpenMeteo(corpo, obtidoEm: agora, origem: OrigemClima.rede), corpo);
+    } on Object {
       throw const ClimaExcecao(FalhaClima.formato);
     }
-    return clima;
+  }
+
+  Future<bool> salvarCache(Clima clima, Map<String, dynamic> corpo) async {
+    try {
+      await armazenamento.gravarJson(
+        ArmazenamentoLocal.chaveClima,
+        {'salvoEm': clima.obtidoEm.toIso8601String(), 'corpo': corpo},
+      );
+      return true;
+    } on FalhaDeGravacao {
+      return false;
+    }
   }
 
   Clima? lerCache() => _deEnvelope(armazenamento.json(ArmazenamentoLocal.chaveClima), OrigemClima.cache);

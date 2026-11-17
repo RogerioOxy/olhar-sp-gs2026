@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/formato.dart';
 import '../../core/textos.dart';
@@ -8,9 +9,11 @@ import '../../core/widgets/blocos.dart';
 import '../../core/widgets/com_territorio.dart';
 import '../../core/widgets/estados.dart';
 import '../../core/widgets/graficos.dart';
+import '../../data/models/registro_local.dart';
 import '../../domain/previsao.dart';
 import '../../domain/series.dart';
 import '../../router/app_router.dart';
+import '../../state/controladores.dart';
 
 class PainelDemandaTela extends StatefulWidget {
   const PainelDemandaTela({super.key, this.zonaInicial});
@@ -41,11 +44,15 @@ class _PainelDemandaTelaState extends State<PainelDemandaTela> {
       body: ComTerritorio(
         builder: (context, t, c) {
           final painel = CoresDoPainel.de(context);
+          final limiares = context.watch<PreferenciasController>().limiares;
           final resumo = c.resumo!;
           final reg = somaRegistrados(c.previsoes);
           final prev = somaPrevistos(c.previsoes);
           final proximo = c.previsoes.fold<double>(0, (s, p) => s + p.previstoProximo);
-          final tendencia = inclinacaoRelativa(ultimos(reg, 12));
+          final indice = IndiceSazonal.calcular(t, ate: t.meses.length);
+          final tendencia = inclinacaoRelativa([
+            for (var i = reg.length - 12; i < reg.length; i++) reg[i] / indice.de(t.meses[i]),
+          ]);
           var lista = c.previsoes.where((p) {
             if (_zona != null && p.distrito.zona != _zona) return false;
             if (_busca.isEmpty) return true;
@@ -147,21 +154,16 @@ class _PainelDemandaTelaState extends State<PainelDemandaTela> {
                       ],
                     ),
                     const SizedBox(height: AppEspaco.sm),
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: AppEspaco.sm,
-                      children: [
-                        Text(Textos.ordenarPor),
-                        DropdownButton<_Ordem>(
-                          value: _ordem,
-                          items: [
-                            DropdownMenuItem(value: _Ordem.desvio, child: Text(Textos.ordemDesvio)),
-                            DropdownMenuItem(value: _Ordem.tendencia, child: Text(Textos.ordemTendencia)),
-                            DropdownMenuItem(value: _Ordem.nome, child: Text(Textos.ordemNome)),
-                          ],
-                          onChanged: (o) => setState(() => _ordem = o ?? _Ordem.desvio),
-                        ),
+                    DropdownButtonFormField<_Ordem>(
+                      initialValue: _ordem,
+                      isExpanded: true,
+                      decoration: InputDecoration(labelText: Textos.ordenarPor),
+                      items: [
+                        DropdownMenuItem(value: _Ordem.desvio, child: Text(Textos.ordemDesvio)),
+                        DropdownMenuItem(value: _Ordem.tendencia, child: Text(Textos.ordemTendencia)),
+                        DropdownMenuItem(value: _Ordem.nome, child: Text(Textos.ordemNome)),
                       ],
+                      onChanged: (o) => setState(() => _ordem = o ?? _Ordem.desvio),
                     ),
                     if (lista.isEmpty)
                       VazioView(
@@ -170,7 +172,7 @@ class _PainelDemandaTelaState extends State<PainelDemandaTela> {
                         mensagem: Textos.buscaVaziaTexto(_busca),
                       )
                     else
-                      for (final p in lista) _LinhaDistrito(p),
+                      for (final p in lista) _LinhaDistrito(p, limiares),
                   ],
                 ),
               ),
@@ -194,22 +196,25 @@ String normalizar(String s) {
 }
 
 class _LinhaDistrito extends StatelessWidget {
-  const _LinhaDistrito(this.p);
+  const _LinhaDistrito(this.p, this.limiares);
 
   final PrevisaoDistrito p;
+  final Limiares limiares;
 
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final painel = CoresDoPainel.de(context);
-    final alto = p.desvio >= 0.2;
-    final baixo = p.desvio <= -0.2;
+    final alto = p.desvio * 100 >= limiares.picoPercentual;
+    final baixo = -p.desvio * 100 >= limiares.quedaPercentual;
+    void abrir() => context.goNamed(Rotas.indicador, pathParameters: {'distritoId': p.distrito.id});
     return Semantics(
       button: true,
+      onTap: abrir,
       label: Textos.linhaDistritoSemantica(p.distrito.nome, p.ultimoReal, p.ultimoPrevisto, p.desvio, p.tendencia),
       excludeSemantics: true,
       child: InkWell(
-        onTap: () => context.goNamed(Rotas.indicador, pathParameters: {'distritoId': p.distrito.id}),
+        onTap: abrir,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: AppEspaco.md),
           child: Row(
@@ -228,7 +233,7 @@ class _LinhaDistrito extends StatelessWidget {
               ),
               const SizedBox(width: AppEspaco.sm),
               Etiqueta(
-                texto: comSinal(p.desvio * 100, (v) => '${decimal(v, 0)}%'),
+                texto: comSinal(p.desvio * 100, (v) => '${decimal(v, 1)}%'),
                 cor: alto || baixo ? painel.alertaAlta : tema.colorScheme.onSurface,
                 fundo: alto || baixo ? painel.altaFundo : tema.colorScheme.surfaceContainerHigh,
               ),

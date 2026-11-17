@@ -67,7 +67,7 @@ class _Detalhe extends StatelessWidget {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final prefs = context.watch<PreferenciasController>();
-    final decisao = prefs.decisoes[alerta.id];
+    final decisao = prefs.decisaoPara(alerta);
     final gestor = prefs.perfil == Perfil.gestor;
     final noIndicador = GoRouterState.of(context).name == Rotas.alertaDoIndicador;
     return PaginaRolavel(
@@ -137,7 +137,7 @@ class _Detalhe extends StatelessWidget {
           child: ListaMarcadores(itens: Textos.alertaSugestoes(alerta.tipo)),
         ),
         if (gestor)
-          _DecisaoHumana(alertaId: alerta.id, atual: decisao)
+          _DecisaoHumana(alerta: alerta, atual: decisao)
         else
           FilledButton.tonalIcon(
             onPressed: () => context.goNamed(Rotas.registrar, queryParameters: {'distrito': alerta.distrito.id}),
@@ -219,9 +219,9 @@ class _GraficoEvidencia extends StatelessWidget {
 }
 
 class _DecisaoHumana extends StatelessWidget {
-  const _DecisaoHumana({required this.alertaId, required this.atual});
+  const _DecisaoHumana({required this.alerta, required this.atual});
 
-  final String alertaId;
+  final Alerta alerta;
   final RegistroDecisao? atual;
 
   @override
@@ -246,11 +246,17 @@ class _DecisaoHumana extends StatelessWidget {
                   label: Text(Textos.decisaoOpcao(d)),
                   selected: atual?.decisao == d,
                   onSelected: (_) async {
-                    await context.read<PreferenciasController>().registrarDecisao(alertaId, d);
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context)
+                    final mensageiro = ScaffoldMessenger.of(context);
+                    String mensagem;
+                    try {
+                      await context.read<PreferenciasController>().registrarDecisao(alerta, d);
+                      mensagem = Textos.decisaoSalva(d);
+                    } on Object {
+                      mensagem = Textos.erroSalvar;
+                    }
+                    mensageiro
                       ..hideCurrentSnackBar()
-                      ..showSnackBar(SnackBar(content: Text(Textos.decisaoSalva(d))));
+                      ..showSnackBar(SnackBar(content: Text(mensagem)));
                   },
                 ),
             ],

@@ -29,8 +29,16 @@ class AjustesTela extends StatelessWidget {
     );
     if (confirmou != true || !context.mounted) return;
     final ocorrencias = context.read<OcorrenciasController>();
-    await context.read<PreferenciasController>().apagarTudo();
+    final clima = context.read<ClimaController>();
+    final mensageiro = ScaffoldMessenger.of(context);
+    try {
+      await context.read<PreferenciasController>().apagarTudo();
+    } on Object {
+      mensageiro.showSnackBar(SnackBar(content: Text(Textos.erroSalvar)));
+      return;
+    }
     ocorrencias.recarregar();
+    await clima.reiniciar();
   }
 
   @override
@@ -78,6 +86,7 @@ class AjustesTela extends StatelessWidget {
             ),
           ),
           Card(
+            semanticContainer: false,
             child: Column(
               children: [
                 ListTile(

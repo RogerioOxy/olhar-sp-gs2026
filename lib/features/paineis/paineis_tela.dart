@@ -66,6 +66,7 @@ class _AtalhoPainel extends StatelessWidget {
     final tema = Theme.of(context);
     return Semantics(
       button: true,
+      onTap: () => context.goNamed(rota),
       label: '$titulo. $texto${sintetico ? '. ${Textos.rotuloSintetico}' : ''}',
       excludeSemantics: true,
       child: Card(

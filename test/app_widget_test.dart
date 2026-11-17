@@ -81,6 +81,14 @@ void main() {
     expect(prefs.getString(ArmazenamentoLocal.chaveConsentimento), isNotNull);
   });
 
+  testWidgets('gestor pode consentir sem escolher distrito', (tester) async {
+    await _abrir(tester);
+    await _tocar(tester, find.text(Textos.perfilNome(Perfil.gestor)));
+    await _tocar(tester, find.byType(CheckboxListTile));
+    await _tocar(tester, find.widgetWithText(FilledButton, Textos.consentimentoBotao));
+    expect(find.text(Textos.inicioGestorTitulo), findsOneWidget);
+  });
+
   testWidgets('fluxo visão geral -> detalhe do indicador -> detalhe do alerta', (tester) async {
     await _abrir(tester, prefs: _consentido());
     expect(find.text(Textos.inicioGestorTitulo), findsOneWidget);

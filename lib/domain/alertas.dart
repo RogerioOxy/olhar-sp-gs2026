@@ -26,6 +26,11 @@ class Alerta {
   final Confianca confianca;
   final Prioridade prioridade;
   final Map<String, num> valores;
+
+  String get assinatura {
+    final chaves = valores.keys.where((k) => !k.startsWith('limiar')).toList()..sort();
+    return [id, for (final k in chaves) '$k=${valores[k]}'].join('|');
+  }
 }
 
 Confianca confiancaPorErro(double mape, double desvioEmRmse) {
@@ -115,7 +120,7 @@ class MotorAlertas {
     final c = clima;
     if (c == null) return;
     final proximos = c.previsao(agora).take(3).toList();
-    if (proximos.isEmpty) return;
+    if (proximos.length < 3) return;
     final soma = proximos.fold<double>(0, (s, d) => s + d.chuvaMm);
     if (soma < limiares.chuvaMm3Dias) return;
     final prob = proximos.map((d) => d.probChuva ?? 0).fold<int>(0, (a, b) => a > b ? a : b);

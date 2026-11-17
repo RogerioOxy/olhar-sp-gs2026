@@ -41,7 +41,7 @@ class ZeladoriaApp extends StatefulWidget {
   State<ZeladoriaApp> createState() => _ZeladoriaAppState();
 }
 
-class _ZeladoriaAppState extends State<ZeladoriaApp> {
+class _ZeladoriaAppState extends State<ZeladoriaApp> with WidgetsBindingObserver {
   late final PreferenciasController _preferencias;
   late final TerritorioController _territorio;
   late final ClimaController _clima;
@@ -64,10 +64,17 @@ class _ZeladoriaAppState extends State<ZeladoriaApp> {
       relogio: widget.relogio,
     );
     _router = criarRouter(_preferencias);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _alertas.recalcular();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _alertas.dispose();
     _router.dispose();
     _preferencias.dispose();

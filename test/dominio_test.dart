@@ -81,7 +81,7 @@ void main() {
       final r = ResumoBacktest.de(previsoes);
       expect(r.meses, 6);
       expect(r.maeMedio, closeTo(28.9, 0.05));
-      expect(r.mapeGeral, closeTo(0.067, 0.0005));
+      expect(r.mapeGeral, closeTo(0.0716, 0.0005));
     });
 
     test('inclinação relativa reconhece alta, queda e estabilidade', () {

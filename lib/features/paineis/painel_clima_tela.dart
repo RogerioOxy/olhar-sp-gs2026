@@ -61,7 +61,13 @@ class _Conteudo extends StatelessWidget {
     final r = ResumoClima.de(clima, hoje);
     final variacao = r.variacao7Dias;
     final tendTemp = inclinacaoRelativa(ultimos(hist, 14).map((d) => d.tempMax).toList());
-    final rotulos = todos.isEmpty ? <String>[] : [dataCurta(todos.first.data), Textos.hoje, dataCurta(todos.last.data)];
+    final marcas = todos.isEmpty
+        ? <(int, String)>[]
+        : [
+            (0, dataCurta(todos.first.data)),
+            if (prev.isNotEmpty) (hist.length, Textos.hoje),
+            (todos.length - 1, dataCurta(todos.last.data)),
+          ];
     return PaginaRolavel(
       onRefresh: controle.atualizar,
       children: [
@@ -72,10 +78,12 @@ class _Conteudo extends StatelessWidget {
           children: [
             Kpi(
               rotulo: Textos.kpiChuva,
-              valor: '${decimal(r.chuvaProximos3)} mm',
-              detalhe: Textos.kpiChuvaLimiar(limiar, r.probMaxProximos3),
+              valor: r.previsaoCompleta ? '${decimal(r.chuvaProximos3)} mm' : Textos.semDado,
+              detalhe: r.previsaoCompleta
+                  ? Textos.kpiChuvaLimiar(limiar, r.probMaxProximos3)
+                  : Textos.climaPrevisaoParcial(r.diasPrevistos),
               icone: Icons.water_drop_outlined,
-              cor: r.chuvaProximos3 >= limiar ? painel.alertaAlta : painel.serieAuxiliar,
+              cor: r.previsaoCompleta && r.chuvaProximos3 >= limiar ? painel.alertaAlta : painel.serieAuxiliar,
             ),
             Kpi(
               rotulo: Textos.kpiChuva7Dias,
@@ -100,7 +108,7 @@ class _Conteudo extends StatelessWidget {
               GraficoColunas(
                 valores: [for (final d in todos) d.chuvaMm],
                 destacarAPartirDe: hist.length,
-                rotulosX: rotulos,
+                marcas: marcas,
                 cor: painel.serieAuxiliar,
                 corDestaque: painel.seriePrevista,
                 descricao: Textos.climaChuvaDescricao(r.chuvaUltimos7, r.chuvaProximos3, hist.length, prev.length),

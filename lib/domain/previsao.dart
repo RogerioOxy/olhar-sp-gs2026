@@ -57,9 +57,9 @@ class ResultadoBacktest {
       : math.sqrt(pontos.map((p) => p.erro * p.erro).reduce((a, b) => a + b) / pontos.length);
 
   double get mape {
-    final soma = pontos.fold<double>(0, (s, p) => s + p.real);
-    if (soma == 0) return 0;
-    return pontos.fold<double>(0, (s, p) => s + p.erro.abs()) / soma;
+    final validos = pontos.where((p) => p.real > 0).toList();
+    if (validos.isEmpty) return 0;
+    return validos.fold<double>(0, (s, p) => s + p.erro.abs() / p.real) / validos.length;
   }
 }
 
@@ -187,17 +187,10 @@ class ResumoBacktest {
   static ResumoBacktest de(List<PrevisaoDistrito> previsoes) {
     if (previsoes.isEmpty) return const ResumoBacktest(maeMedio: 0, mapeGeral: 0, meses: 0);
     final mae = previsoes.map((p) => p.backtest.mae).reduce((a, b) => a + b) / previsoes.length;
-    var erro = 0.0;
-    var real = 0.0;
-    for (final p in previsoes) {
-      for (final ponto in p.backtest.pontos) {
-        erro += ponto.erro.abs();
-        real += ponto.real;
-      }
-    }
+    final todos = [for (final p in previsoes) ...p.backtest.pontos];
     return ResumoBacktest(
       maeMedio: mae,
-      mapeGeral: real == 0 ? 0 : erro / real,
+      mapeGeral: ResultadoBacktest(todos).mape,
       meses: previsoes.first.backtest.pontos.length,
     );
   }

@@ -28,12 +28,16 @@ class ResumoClima {
     required this.chuvaUltimos7,
     required this.chuva7Anteriores,
     required this.probMaxProximos3,
+    required this.diasPrevistos,
   });
 
   final double chuvaProximos3;
   final double chuvaUltimos7;
   final double chuva7Anteriores;
   final int probMaxProximos3;
+  final int diasPrevistos;
+
+  bool get previsaoCompleta => diasPrevistos >= 3;
 
   double? get variacao7Dias => chuva7Anteriores == 0 ? null : (chuvaUltimos7 - chuva7Anteriores) / chuva7Anteriores;
 
@@ -48,6 +52,7 @@ class ResumoClima {
       chuvaUltimos7: soma(ult7),
       chuva7Anteriores: soma(ant7),
       probMaxProximos3: prev.fold<int>(0, (m, d) => (d.probChuva ?? 0) > m ? d.probChuva! : m),
+      diasPrevistos: prev.length,
     );
   }
 }

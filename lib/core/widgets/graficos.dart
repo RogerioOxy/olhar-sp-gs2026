@@ -239,6 +239,16 @@ class _PintorLinha extends CustomPainter {
           cima.add(Offset(xDe(i), yDe(v + f)));
           baixoPts.add(Offset(xDe(i), yDe(v - f)));
         }
+        if (cima.length == 1) {
+          final pf = Paint()
+            ..color = s.cor
+            ..strokeWidth = 2;
+          final a = cima.first;
+          final b = baixoPts.first;
+          canvas.drawLine(a, b, pf);
+          canvas.drawLine(a.translate(-6, 0), a.translate(6, 0), pf);
+          canvas.drawLine(b.translate(-6, 0), b.translate(6, 0), pf);
+        }
         if (cima.length > 1) {
           final path = Path()..moveTo(cima.first.dx, cima.first.dy);
           for (final p in cima.skip(1)) {
@@ -361,7 +371,7 @@ class GraficoColunas extends StatelessWidget {
     super.key,
     required this.valores,
     required this.destacarAPartirDe,
-    required this.rotulosX,
+    required this.marcas,
     required this.descricao,
     required this.cor,
     required this.corDestaque,
@@ -370,7 +380,7 @@ class GraficoColunas extends StatelessWidget {
 
   final List<double> valores;
   final int destacarAPartirDe;
-  final List<String> rotulosX;
+  final List<(int, String)> marcas;
   final String descricao;
   final Color cor;
   final Color corDestaque;
@@ -412,12 +422,21 @@ class GraficoColunas extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppEspaco.xs),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              for (final r in rotulosX)
-                Text(r, style: tema.textTheme.labelSmall?.copyWith(color: tema.colorScheme.onSurfaceVariant)),
-            ],
+          SizedBox(
+            height: 18 * MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6).scale(1),
+            child: Stack(
+              children: [
+                for (final (i, r) in marcas)
+                  Align(
+                    alignment: Alignment(valores.length <= 1 ? 0 : -1 + 2 * i / (valores.length - 1), 0),
+                    child: Text(
+                      r,
+                      style: tema.textTheme.labelSmall?.copyWith(color: tema.colorScheme.onSurfaceVariant),
+                      textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.6),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),

@@ -62,15 +62,24 @@ class _LimiaresTelaState extends State<LimiaresTela> {
     setState(() => _salvando = true);
     final alertas = context.read<AlertasController>();
     final antes = alertas.alertas.map((a) => a.id).toSet();
-    await context.read<PreferenciasController>().salvarLimiares(
-      Limiares(
-        picoPercentual: int.parse(_pico.text),
-        quedaPercentual: int.parse(_queda.text),
-        chuvaMm3Dias: int.parse(_chuva.text),
-        ocorrencias7Dias: int.parse(_ocorrencias.text),
-        subRegistroPercentual: int.parse(_sub.text),
-      ),
-    );
+    try {
+      await context.read<PreferenciasController>().salvarLimiares(
+        Limiares(
+          picoPercentual: int.parse(_pico.text),
+          quedaPercentual: int.parse(_queda.text),
+          chuvaMm3Dias: int.parse(_chuva.text),
+          ocorrencias7Dias: int.parse(_ocorrencias.text),
+          subRegistroPercentual: int.parse(_sub.text),
+        ),
+      );
+    } on Object {
+      if (!mounted) return;
+      setState(() => _salvando = false);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(Textos.erroSalvar)));
+      return;
+    }
     if (!mounted) return;
     setState(() => _salvando = false);
     final depois = alertas.alertas.map((a) => a.id).toSet();
@@ -80,6 +89,8 @@ class _LimiaresTelaState extends State<LimiaresTela> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
+          persist: false,
+          duration: const Duration(seconds: 6),
           content: Text(Textos.limiaresSalvos(novos, sairam, depois.length)),
           action: SnackBarAction(label: Textos.verAlertas, onPressed: () => context.goNamed(Rotas.alertas)),
         ),

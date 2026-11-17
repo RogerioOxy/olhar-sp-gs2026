@@ -94,8 +94,12 @@ class _VisaoGestor extends StatelessWidget {
             ),
             Kpi(
               rotulo: Textos.kpiChuva,
-              valor: rc == null ? Textos.semDado : '${decimal(rc.chuvaProximos3)} mm',
-              detalhe: rc == null ? Textos.climaIndisponivelCurto : Textos.kpiChuvaDetalhe(rc.probMaxProximos3),
+              valor: rc == null || !rc.previsaoCompleta ? Textos.semDado : '${decimal(rc.chuvaProximos3)} mm',
+              detalhe: rc == null
+                  ? Textos.climaIndisponivelCurto
+                  : rc.previsaoCompleta
+                  ? Textos.kpiChuvaDetalhe(rc.probMaxProximos3)
+                  : Textos.climaPrevisaoParcial(rc.diasPrevistos),
               icone: Icons.water_drop_outlined,
               cor: painel.serieAuxiliar,
               onTap: () => context.goNamed(Rotas.painelClima),

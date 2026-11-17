@@ -27,15 +27,16 @@ class Ocorrencia {
   };
 
   static Ocorrencia? fromJson(Map<String, dynamic> json) {
-    final c = categoriaPorChave(json['categoria'] as String? ?? '');
-    final data = DateTime.tryParse(json['criadaEm'] as String? ?? '');
-    if (c == null || data == null) return null;
+    String texto(String k) => json[k] is String ? json[k] as String : '';
+    final c = categoriaPorChave(texto('categoria'));
+    final data = DateTime.tryParse(texto('criadaEm'));
+    if (c == null || data == null || texto('distritoId').isEmpty) return null;
     return Ocorrencia(
-      id: json['id'] as String? ?? '',
-      distritoId: json['distritoId'] as String? ?? '',
+      id: texto('id'),
+      distritoId: texto('distritoId'),
       categoria: c,
-      descricao: json['descricao'] as String? ?? '',
-      referencia: json['referencia'] as String? ?? '',
+      descricao: texto('descricao'),
+      referencia: texto('referencia'),
       criadaEm: data,
     );
   }
@@ -73,7 +74,8 @@ class Limiares {
   factory Limiares.fromJson(Map<String, dynamic> json) {
     const p = Limiares();
     int ler(String k, int padrao, (int, int) faixa) {
-      final v = (json[k] as num?)?.toInt() ?? padrao;
+      final bruto = json[k];
+      final v = bruto is num ? bruto.toInt() : padrao;
       return v < faixa.$1 || v > faixa.$2 ? padrao : v;
     }
 
@@ -108,19 +110,21 @@ class Limiares {
 enum DecisaoHumana { vistoriar, monitorar, descartar }
 
 class RegistroDecisao {
-  const RegistroDecisao(this.decisao, this.em);
+  const RegistroDecisao(this.decisao, this.em, this.assinatura);
 
   final DecisaoHumana decisao;
   final DateTime em;
+  final String assinatura;
 
-  Map<String, dynamic> toJson() => {'decisao': decisao.name, 'em': em.toIso8601String()};
+  Map<String, dynamic> toJson() => {'decisao': decisao.name, 'em': em.toIso8601String(), 'assinatura': assinatura};
 
   static RegistroDecisao? fromJson(Map<String, dynamic> json) {
-    final nome = json['decisao'] as String?;
-    final em = DateTime.tryParse(json['em'] as String? ?? '');
+    final nome = json['decisao'] is String ? json['decisao'] as String : null;
+    final em = DateTime.tryParse(json['em'] is String ? json['em'] as String : '');
+    final assinatura = json['assinatura'] is String ? json['assinatura'] as String : '';
     final d = DecisaoHumana.values.where((v) => v.name == nome);
     if (d.isEmpty || em == null) return null;
-    return RegistroDecisao(d.first, em);
+    return RegistroDecisao(d.first, em, assinatura);
   }
 }
 

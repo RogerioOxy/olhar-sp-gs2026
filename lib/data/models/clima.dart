@@ -39,9 +39,12 @@ class Clima {
     longitude: longitude,
   );
 
+  DateTime get _diaDaColeta => DateTime(obtidoEm.year, obtidoEm.month, obtidoEm.day);
+
   List<DiaClima> historico(DateTime hoje) {
     final h = DateTime(hoje.year, hoje.month, hoje.day);
-    return dias.where((d) => d.data.isBefore(h)).toList();
+    final limite = _diaDaColeta.isBefore(h) ? _diaDaColeta : h;
+    return dias.where((d) => d.data.isBefore(limite)).toList();
   }
 
   List<DiaClima> previsao(DateTime hoje) {

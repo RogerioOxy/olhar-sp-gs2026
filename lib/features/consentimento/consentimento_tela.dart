@@ -25,8 +25,14 @@ class _ConsentimentoTelaState extends State<ConsentimentoTela> {
   Future<void> _continuar() async {
     if (!(_form.currentState?.validate() ?? false)) return;
     setState(() => _enviando = true);
-    await context.read<PreferenciasController>().darConsentimento(perfil: _perfil, distritoId: _distrito);
-    if (mounted) setState(() => _enviando = false);
+    final mensageiro = ScaffoldMessenger.of(context);
+    try {
+      await context.read<PreferenciasController>().darConsentimento(perfil: _perfil, distritoId: _distrito);
+    } on Object {
+      mensageiro.showSnackBar(SnackBar(content: Text(Textos.erroSalvar)));
+    } finally {
+      if (mounted) setState(() => _enviando = false);
+    }
   }
 
   @override

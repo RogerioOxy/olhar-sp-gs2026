@@ -128,7 +128,7 @@ class AnaliseEquidade {
     }
     final estimados = achados / territorio.amostraVistoria;
     final p = estimados == 0 ? 0.0 : limitar01(reg / estimados);
-    final margem = achados == 0 ? 1.0 : 1.96 * math.sqrt(p * (1 - p) / achados) + 1 / achados;
+    final margem = achados == 0 ? 1.0 : 1.96 * math.sqrt(p * (1 - p) / achados);
     return SubRegistroDistrito(
       distrito: d,
       estimativa: estimados == 0 ? 0 : limitar01(1 - p),

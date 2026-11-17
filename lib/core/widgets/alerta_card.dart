@@ -25,11 +25,12 @@ class AlertaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final novo = context.select<AlertasController, bool>((a) => a.novos.contains(alerta.id));
-    final decisao = context.select<PreferenciasController, Object?>((p) => p.decisoes[alerta.id]);
+    final decisao = context.select<PreferenciasController, Object?>((p) => p.decisaoPara(alerta));
     final titulo = Textos.alertaTitulo(alerta.tipo);
     final resumo = Textos.alertaResumo(alerta);
     return Semantics(
       button: true,
+      onTap: onTap,
       label: [
         if (novo) Textos.alertaNovo,
         titulo,

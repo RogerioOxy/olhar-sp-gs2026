@@ -9,6 +9,7 @@ import '../../core/validadores.dart';
 import '../../core/widgets/blocos.dart';
 import '../../core/widgets/campos.dart';
 import '../../core/widgets/estados.dart';
+import '../../data/models/registro_local.dart';
 import '../../data/models/territorio.dart';
 import '../../router/app_router.dart';
 import '../../state/controladores.dart';
@@ -73,13 +74,23 @@ class _RegistrarTelaState extends State<RegistrarTela> {
     setState(() => _enviando = true);
     final alertas = context.read<AlertasController>();
     final antes = alertas.alertas.map((a) => a.id).toSet();
-    final o = await context.read<OcorrenciasController>().registrar(
-      distritoId: _distrito!,
-      categoria: _categoria!,
-      descricao: _descricao.text,
-      referencia: _referencia.text,
-      marcadorRemovido: Textos.marcadorRemovido,
-    );
+    final Ocorrencia o;
+    try {
+      o = await context.read<OcorrenciasController>().registrar(
+        distritoId: _distrito!,
+        categoria: _categoria!,
+        descricao: _descricao.text,
+        referencia: _referencia.text,
+        marcadorRemovido: Textos.marcadorRemovido,
+      );
+    } on Object {
+      if (!mounted) return;
+      setState(() => _enviando = false);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(Textos.erroSalvar)));
+      return;
+    }
     if (!mounted) return;
     final novos = alertas.alertas.where((a) => !antes.contains(a.id)).toList();
     setState(() {
@@ -212,7 +223,7 @@ class _RegistrarTelaState extends State<RegistrarTela> {
                   ? VazioView(titulo: Textos.minhasOcorrenciasVazioTitulo, mensagem: Textos.minhasOcorrenciasVazioTexto)
                   : Column(
                       children: [
-                        for (final o in ocorrencias.take(10))
+                        for (final o in ocorrencias)
                           ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: const Icon(Icons.place_outlined),

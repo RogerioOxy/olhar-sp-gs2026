@@ -17,6 +17,7 @@ class Secao extends StatelessWidget {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     return Card(
+      semanticContainer: false,
       child: Padding(
         padding: const EdgeInsets.all(AppEspaco.lg),
         child: Column(
@@ -42,7 +43,10 @@ class Secao extends StatelessWidget {
                 ),
                 if (acao != null) ...[
                   const SizedBox(width: AppEspaco.sm),
-                  Flexible(child: acao!),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.42),
+                    child: acao!,
+                  ),
                 ],
               ],
             ),
@@ -106,6 +110,7 @@ class Kpi extends StatelessWidget {
     return Semantics(
       container: true,
       button: onTap != null,
+      onTap: onTap,
       label: [rotulo, valor, ?detalhe].join('. '),
       excludeSemantics: true,
       child: Card(

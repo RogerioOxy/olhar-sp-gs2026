@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/textos.dart';
 import '../../core/widgets/estados.dart';
+import '../../router/app_router.dart';
 import '../../state/controladores.dart';
 
 class Casca extends StatelessWidget {
@@ -77,7 +78,7 @@ class NaoEncontradaTela extends StatelessWidget {
         titulo: Textos.naoEncontradaTitulo,
         mensagem: Textos.naoEncontradaTexto,
         acaoRotulo: Textos.voltarAoInicio,
-        onAcao: () => context.goNamed('inicio'),
+        onAcao: () => context.goNamed(Rotas.inicio),
       ),
     );
   }
