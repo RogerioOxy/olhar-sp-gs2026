@@ -171,7 +171,7 @@ A resposta do clima fica salva no aparelho. Sem internet, o app mostra o último
 1. Clone o repositório, substituindo o marcador pelo endereço do projeto:
 
    ```bash
-   git clone [LINK DO GITHUB]
+   git clone https://github.com/RogerioOxy/olhar-sp-gs2026.git
    ```
 
 2. Entre na pasta criada pelo clone. Ela tem o nome do repositório; ajuste o comando se o repositório tiver outro nome:
