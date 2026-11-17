@@ -7,6 +7,10 @@ import '../domain/alertas.dart';
 import '../domain/previsao.dart';
 
 class Textos {
+  static const erroSalvar =
+      'Não foi possível salvar no aparelho. Tente de novo.';
+  static String climaPrevisaoParcial(int dias) =>
+      'A previsão salva está incompleta: $dias ${dias == 1 ? 'dia disponível' : 'dias disponíveis'} de 3 necessários. Atualize com internet.';
   static const appNome = 'Olhar SP';
   static const appSlogan =
       'Previsões e registros para cuidar dos distritos de São Paulo.';
@@ -52,7 +56,7 @@ class Textos {
   static const navPaineisDica = 'Explorar os painéis';
   static const navAlertas = 'Alertas';
   static String navAlertasDica(int total, int novos) =>
-      'Alertas: $total, novos: $novos';
+      '${total == 1 ? 'Alerta' : 'Alertas'}: $total, ${novos == 1 ? 'novo' : 'novos'}: $novos';
   static const navRegistrar = 'Registrar';
   static const navRegistrarDica = 'Registrar uma ocorrência';
   static const navAjustes = 'Ajustes';
@@ -127,7 +131,8 @@ class Textos {
   static const List<String> consentimentoItens = [
     'O app guarda ocorrências, decisões, preferências, clima e a data do consentimento só neste aparelho.',
     'Não pedimos nome, telefone nem e-mail.',
-    'E-mail, telefone, CPF, placa e número de casa identificados nos textos são trocados por [removido]. Evite dados pessoais.',
+    'E-mail, telefone, CPF, placa, nome após "meu nome é", "me chamo" ou "sou" e número após nome de rua, quando identificados, são trocados por [removido].',
+    'A remoção automática pode falhar com nome ou endereço escrito de outro jeito. Não escreva nome, contato nem endereço completo.',
     'Você pode apagar todos os dados em Ajustes.',
     'Os dados de zeladoria são simulados. Os dados de clima são reais, da Open-Meteo.',
   ];
@@ -162,7 +167,7 @@ class Textos {
       '${inteiro(altas)} com prioridade alta';
   static const kpiAcerto = 'Erro percentual';
   static String kpiAcertoDetalhe(double mae, int meses) =>
-      'Erro médio de ${decimal(mae)} pedidos por mês e distrito no teste de $meses meses.';
+      'Erro médio de ${decimal(mae)} ${decimal(mae) == '1,0' ? 'pedido' : 'pedidos'} por mês e distrito no teste de $meses ${meses == 1 ? 'mês' : 'meses'}.';
   static const kpiSocial = 'Diferença de atendimento';
   static String kpiSocialDetalhe(double baixa, double alta) =>
       'Por 10 mil hab./mês: baixa renda ${decimal(baixa)}; alta renda ${decimal(alta)}.';
@@ -177,14 +182,14 @@ class Textos {
     double registradosUltimo,
     double previstoUltimo,
   ) =>
-      'Pedidos na cidade nos últimos 12 meses. No último mês: ${inteiro(registradosUltimo)} registrados e ${inteiro(previstoUltimo)} previstos.';
+      'Pedidos na cidade nos últimos 12 meses. No último mês: ${inteiro(registradosUltimo)} ${inteiro(registradosUltimo) == '1' ? 'registrado' : 'registrados'} e ${inteiro(previstoUltimo)} ${inteiro(previstoUltimo) == '1' ? 'previsto' : 'previstos'}.';
   static const serieRegistrados = 'Registrados';
   static const seriePrevistos = 'Previstos';
   static const inicioDesviosTitulo = 'Maiores desvios por distrito';
   static const inicioDesviosSubtitulo =
       'Diferença entre registrados e previstos no último mês.';
   static String desvioLinha(int real, double previsto, double desvio) =>
-      '${inteiro(real)} registrados, ${inteiro(previsto)} previstos (${comSinal(desvio, percentual)})';
+      '${inteiro(real)} ${inteiro(real) == '1' ? 'registrado' : 'registrados'}, ${inteiro(previsto)} ${inteiro(previsto) == '1' ? 'previsto' : 'previstos'} (${comSinal(desvio, percentual)})';
   static const inicioAlertasTitulo = 'Alertas para analisar';
 
   static const meuDistritoVazioTitulo = 'Escolha seu distrito';
@@ -196,7 +201,7 @@ class Textos {
       'Acompanhe os pedidos, a previsão e os alertas do seu distrito. Os dados de zeladoria são simulados.';
   static const kpiPrevistoProximo = 'Previsão do próximo mês';
   static String kpiPrevistoProximoDetalhe(double faixa) =>
-      'Faixa de ${inteiro(faixa)} pedidos para mais ou para menos.';
+      'Faixa aproximada de ${inteiro(faixa)} ${inteiro(faixa) == '1' ? 'pedido' : 'pedidos'} para mais ou para menos: 1,28 x RMSE do teste de 6 meses. É uma heurística, supondo erros parecidos com os do teste e mais ou menos simétricos. A cobertura real não foi medida; não é garantia.';
   static const kpiAtendimentoDistrito = 'Atendidos por 10 mil hab.';
   static String kpiAtendimentoDistritoDetalhe(double baixa, double alta) =>
       'Médias por 10 mil hab./mês: baixa renda ${decimal(baixa)}; alta renda ${decimal(alta)}.';
@@ -206,14 +211,14 @@ class Textos {
     int real,
     double previsto,
   ) =>
-      'Pedidos em $nome. No último mês: ${inteiro(real)} registrados e ${inteiro(previsto)} previstos.';
+      'Pedidos em $nome. No último mês: ${inteiro(real)} ${inteiro(real) == '1' ? 'registrado' : 'registrados'} e ${inteiro(previsto)} ${inteiro(previsto) == '1' ? 'previsto' : 'previstos'}.';
   static const meuDistritoAlertasTitulo = 'Alertas do distrito';
   static const meuDistritoSemAlertasTitulo = 'Sem alertas ativos';
   static const meuDistritoSemAlertasTexto =
       'Nenhum alerta atingiu os limites atuais. Isso não significa que não haja problemas.';
   static const meuDistritoSubRegistroTitulo = 'O que pode ficar sem registro';
   static String meuDistritoSubRegistroTexto(double estimativa, double margem) =>
-      'Estima-se que ${percentual(estimativa)} dos problemas fiquem sem registro, com margem de ${decimal(margem * 100, 1)} pontos percentuais para mais ou para menos. É uma estimativa com dados sintéticos.';
+      'Estima-se que ${percentual(estimativa)} dos problemas fiquem sem registro, com margem de ${decimal(margem * 100, 1)} ${decimal(margem * 100, 1) == '1,0' ? 'ponto percentual' : 'pontos percentuais'} para mais ou para menos. A margem aproxima a incerteza da amostra, sem cobertura comprovada. Registros e achados vêm de processos separados. Os dados são sintéticos.';
   static const minhasOcorrenciasTitulo = 'Minhas ocorrências';
   static const minhasOcorrenciasSubtitulo =
       'Estes registros ficam só neste aparelho.';
@@ -239,13 +244,13 @@ class Textos {
       'A previsão usa a média dos 3 meses anteriores sem o efeito da estação e aplica o padrão sazonal da cidade. O cálculo usa só o passado e precisa de 12 meses de histórico.';
   static String kpiRegistradosMes(String mes) => 'Registros: $mes';
   static String kpiRegistradosMesDetalhe(double previsto) =>
-      'Previsão: ${inteiro(previsto)} pedidos.';
+      'Previsão: ${inteiro(previsto)} ${inteiro(previsto) == '1' ? 'pedido' : 'pedidos'}.';
   static const kpiPrevistoCidade = 'Previsão para a cidade';
   static String kpiPrevistoCidadeDetalhe(String mes) =>
       'Pedidos previstos para $mes.';
   static const kpiErroModelo = 'Erro médio em pedidos';
   static String kpiErroModeloDetalhe(double mape, int meses) =>
-      'Erro percentual de ${percentual(mape, 1)} no teste de $meses meses.';
+      'Erro percentual de ${percentual(mape, 1)} no teste de $meses ${meses == 1 ? 'mês' : 'meses'}.';
   static const demandaGraficoTitulo = 'Histórico e próximo mês';
   static const demandaGraficoSubtitulo =
       '24 meses de registros. O trecho tracejado mostra a previsão do próximo mês.';
@@ -283,7 +288,7 @@ class Textos {
   static const kpiErroDistrito = 'Erro médio em pedidos';
   static const indicadorGraficoTitulo = 'Registros e previsão';
   static const indicadorGraficoSubtitulo =
-      'A faixa sombreada é a margem da previsão: 1,28 vezes o RMSE, com cobertura aproximada de 80%, sem garantia.';
+      'A faixa sombreada é aproximada: 1,28 x RMSE do teste de 6 meses. É uma heurística que supõe erros parecidos com os do teste e mais ou menos simétricos. A cobertura real não foi medida; não é garantia.';
   static const backtestTitulo = 'Teste com meses anteriores';
   static const backtestSubtitulo =
       'De abril a setembro de 2026: cada previsão usou só os dados anteriores ao mês previsto.';
@@ -292,7 +297,7 @@ class Textos {
   static const colunaReal = 'Registrado';
   static const colunaErro = 'Erro';
   static String linhaBacktestSemantica(String mes, double previsto, int real) =>
-      '$mes: ${inteiro(previsto)} previstos, ${inteiro(real)} registrados. Erro: ${comSinal(real - previsto, inteiro)} pedidos.';
+      '$mes: ${inteiro(previsto)} ${inteiro(previsto) == '1' ? 'previsto' : 'previstos'}, ${inteiro(real)} ${inteiro(real) == '1' ? 'registrado' : 'registrados'}. Erro: ${comSinal(real - previsto, inteiro)} ${(real - previsto).abs().round() == 1 ? 'pedido' : 'pedidos'}.';
   static const categoriasTitulo = 'Tipos de pedido';
   static String categoriasDescricao(
     String distrito,
@@ -345,9 +350,9 @@ class Textos {
     int diasHistorico,
     int diasPrevisao,
   ) =>
-      'Chuva em $diasHistorico dias observados e $diasPrevisao previstos. Últimos 7 dias: ${decimal(ultimos7)} mm. Próximos 3 dias: ${decimal(proximos3)} mm.';
+      'Chuva em $diasHistorico ${diasHistorico == 1 ? 'dia observado' : 'dias observados'} e $diasPrevisao ${diasPrevisao == 1 ? 'previsto' : 'previstos'}. Últimos 7 dias: ${decimal(ultimos7)} mm. Próximos 3 dias: ${decimal(proximos3)} mm.';
   static String chuvaPrevistaDescricao(double soma3Dias, int dias) =>
-      'Previsão de ${decimal(soma3Dias)} mm somados em $dias dias.';
+      'Previsão de ${decimal(soma3Dias)} mm somados em $dias ${dias == 1 ? 'dia' : 'dias'}.';
   static const legendaChuvaObservada = 'Observada';
   static const legendaChuvaPrevista = 'Prevista';
   static const climaTempTitulo = 'Temperatura';
@@ -385,7 +390,7 @@ class Textos {
   ) =>
       'Atendimentos por 10 mil habitantes por mês: baixa renda ${decimal(baixa)}, alta renda ${decimal(alta)}. Diferença: ${decimal(diferenca)}. Média dos últimos 3 meses, com dados sintéticos.';
   static const socialComoLer =
-      'Uma diferença menor indica atendimento mais equilibrado. Se os alertas ajudarem a orientar vistorias onde há pouco registro, essa diferença pode cair. É uma hipótese a acompanhar.';
+      'A diferença cair só é boa notícia se o atendimento da baixa renda subir. Se cair porque a alta renda perdeu atendimento, não é melhora. Olhe a diferença junto com o valor da baixa renda. Os alertas podem ajudar a orientar vistorias onde há pouco registro; é uma hipótese a acompanhar.';
   static const subRegistroTitulo = 'Problemas sem registro';
   static String subRegistroSubtitulo(int amostraPct) =>
       'Estimativa com vistoria simulada em $amostraPct% das ruas.';
@@ -399,14 +404,14 @@ class Textos {
       'Histórico da estimativa de sub-registro por faixa de renda. Dados sintéticos; valores maiores indicam uma parcela estimada maior de problemas sem registro.';
   static const subRegistroDistritosTitulo = 'Estimativa por distrito';
   static const subRegistroDistritosSubtitulo =
-      'Últimos 3 meses. A margem indica a incerteza da amostra simulada.';
+      'Últimos 3 meses. A margem aproxima a incerteza da amostra simulada, sem cobertura comprovada. Registros e achados vêm de processos separados.';
   static String subRegistroLinha(
     double estimativa,
     double margem,
     int achados,
     FaixaRenda f,
   ) =>
-      '${percentual(estimativa)} estimados sem registro; margem de ${decimal(margem * 100)} pontos percentuais. ${inteiro(achados)} achados na amostra. ${faixa(f)}. Dados sintéticos.';
+      '${percentual(estimativa)} estimados sem registro; margem de ${decimal(margem * 100)} ${decimal(margem * 100) == '1,0' ? 'ponto percentual' : 'pontos percentuais'}. ${inteiro(achados)} ${inteiro(achados) == '1' ? 'achado' : 'achados'} na amostra. ${faixa(f)}. Dados sintéticos.';
   static const equidadeLimitacoesTitulo = 'Limites desta comparação';
   static const List<String> equidadeLimitacoes = [
     'População, renda, pedidos e vistorias são sintéticos; só os nomes dos distritos são reais.',
@@ -422,13 +427,13 @@ class Textos {
       : 'Há ${inteiro(n)} alertas novos para analisar.';
   static const alertasSemClima =
       'Sem dados de clima, o alerta de chuva fica desligado.';
-  static String filtroTodos(int qtd) => 'Todos ($qtd)';
+  static String filtroTodos(int qtd) => '${qtd == 1 ? 'Todo' : 'Todos'} ($qtd)';
   static String filtroTipo(TipoAlerta t, int qtd) =>
       '${switch (t) {
         TipoAlerta.picoDemanda => 'Pico',
         TipoAlerta.quedaRegistro => 'Queda',
         TipoAlerta.chuvaForte => 'Chuva',
-        TipoAlerta.ocorrenciasCidadao => 'Ocorrências',
+        TipoAlerta.ocorrenciasCidadao => qtd == 1 ? 'Ocorrência' : 'Ocorrências',
         TipoAlerta.subRegistro => 'Sub-registro',
       }} ($qtd)';
   static const soMeuDistrito = 'Só meu distrito';
@@ -448,21 +453,21 @@ class Textos {
   };
   static String alertaResumo(Alerta a) => switch (a.tipo) {
     TipoAlerta.picoDemanda =>
-      '${a.distrito.nome}: ${inteiro(a.valores['real']!)} registrados e ${inteiro(a.valores['previsto']!)} previstos (${comSinal(a.valores['desvioPct']!, inteiro)}%) em outubro. Dados sintéticos.',
+      '${a.distrito.nome}: ${inteiro(a.valores['real']!)} ${inteiro(a.valores['real']!) == '1' ? 'registrado' : 'registrados'} e ${inteiro(a.valores['previsto']!)} ${inteiro(a.valores['previsto']!) == '1' ? 'previsto' : 'previstos'} (${comSinal(a.valores['desvioPct']!, inteiro)}%) em outubro. Dados sintéticos.',
     TipoAlerta.quedaRegistro =>
-      '${a.distrito.nome}: ${inteiro(a.valores['real']!)} registrados ante ${inteiro(a.valores['previsto']!)} previstos (${inteiro(a.valores['desvioPct']!)}%). Pode haver menos problemas ou menos registros; dados sintéticos.',
+      '${a.distrito.nome}: ${inteiro(a.valores['real']!)} ${inteiro(a.valores['real']!) == '1' ? 'registrado' : 'registrados'} ante ${inteiro(a.valores['previsto']!)} ${inteiro(a.valores['previsto']!) == '1' ? 'previsto' : 'previstos'} (${inteiro(a.valores['desvioPct']!)}%). Pode haver menos problemas ou menos registros; dados sintéticos.',
     TipoAlerta.chuvaForte =>
       'Previsão de ${decimal(a.valores['chuva3DiasMm']!)} mm em 3 dias. Em ${a.distrito.nome}, ${inteiro(a.valores['bocaDeLoboPct']!)}% dos pedidos simulados são de boca de lobo.',
     TipoAlerta.ocorrenciasCidadao =>
-      '${a.distrito.nome}: ${inteiro(a.valores['quantidade']!)} ocorrências locais em 7 dias, sendo ${inteiro(a.valores['qtdCategoriaPrincipal']!)} de ${categoria(Categoria.values[a.valores['categoriaPrincipal']!.toInt()]).toLowerCase()}. Relatos não verificados.',
+      '${a.distrito.nome}: ${inteiro(a.valores['quantidade']!)} ${a.valores['quantidade'] == 1 ? 'ocorrência local' : 'ocorrências locais'} em 7 dias, sendo ${inteiro(a.valores['qtdCategoriaPrincipal']!)} de ${categoria(Categoria.values[a.valores['categoriaPrincipal']!.toInt()]).toLowerCase()}. Relatos não verificados.',
     TipoAlerta.subRegistro =>
-      '${a.distrito.nome}: sub-registro estimado de ${inteiro(a.valores['estimativaPct']!)}%, com margem de ${inteiro(a.valores['margemPct']!)} pontos percentuais. Dados sintéticos; vale avaliar uma vistoria.',
+      '${a.distrito.nome}: sub-registro estimado de ${inteiro(a.valores['estimativaPct']!)}%, com margem de ${inteiro(a.valores['margemPct']!)} ${inteiro(a.valores['margemPct']!) == '1' ? 'ponto percentual' : 'pontos percentuais'}. Dados sintéticos; vale avaliar uma vistoria.',
   };
   static List<String> alertaJustificativa(Alerta a) => switch (a.tipo) {
     TipoAlerta.picoDemanda || TipoAlerta.quedaRegistro => [
-      'Último mês: ${inteiro(a.valores['real']!)} pedidos registrados e ${inteiro(a.valores['previsto']!)} previstos.',
+      'Último mês: ${inteiro(a.valores['real']!)} ${inteiro(a.valores['real']!) == '1' ? 'pedido registrado' : 'pedidos registrados'} e ${inteiro(a.valores['previsto']!)} ${inteiro(a.valores['previsto']!) == '1' ? 'previsto' : 'previstos'}.',
       'Desvio: ${comSinal(a.valores['desvioPct']!, inteiro)}%. Limite de ${a.tipo == TipoAlerta.picoDemanda ? 'alta' : 'queda'}: ${inteiro(a.valores['limiarPct']!)}%.',
-      'Teste de ${inteiro(a.valores['mesesBacktest']!)} meses: erro médio de ${inteiro(a.valores['mae']!)} pedidos e erro percentual de ${inteiro(a.valores['mapePct']!)}%. Dados sintéticos.',
+      'Teste de ${inteiro(a.valores['mesesBacktest']!)} ${inteiro(a.valores['mesesBacktest']!) == '1' ? 'mês' : 'meses'}: erro médio de ${inteiro(a.valores['mae']!)} ${inteiro(a.valores['mae']!) == '1' ? 'pedido' : 'pedidos'} e erro percentual de ${inteiro(a.valores['mapePct']!)}%. Dados sintéticos.',
     ],
     TipoAlerta.chuvaForte => [
       'Chuva somada nos próximos 3 dias: ${decimal(a.valores['chuva3DiasMm']!)} mm. Limite: ${inteiro(a.valores['limiarMm']!)} mm.',
@@ -470,23 +475,23 @@ class Textos {
       'Bocas de lobo representam ${inteiro(a.valores['bocaDeLoboPct']!)}% dos pedidos simulados. Seleção de até 3 distritos com maior proporção, a partir de 20%.',
     ],
     TipoAlerta.ocorrenciasCidadao => [
-      '${inteiro(a.valores['quantidade']!)} ocorrências neste distrito nos últimos 7 dias. Limite: ${inteiro(a.valores['limiar']!)}.',
-      'Tipo mais frequente: ${categoria(Categoria.values[a.valores['categoriaPrincipal']!.toInt()])}, com ${inteiro(a.valores['qtdCategoriaPrincipal']!)} registros.',
+      '${inteiro(a.valores['quantidade']!)} ${a.valores['quantidade'] == 1 ? 'ocorrência' : 'ocorrências'} neste distrito nos últimos 7 dias. Limite: ${inteiro(a.valores['limiar']!)}.',
+      'Tipo mais frequente: ${categoria(Categoria.values[a.valores['categoriaPrincipal']!.toInt()])}, com ${inteiro(a.valores['qtdCategoriaPrincipal']!)} ${inteiro(a.valores['qtdCategoriaPrincipal']!) == '1' ? 'registro' : 'registros'}.',
       'A contagem usa só os registros deste aparelho, sem verificação.',
     ],
     TipoAlerta.subRegistro => [
-      'Sub-registro estimado: ${inteiro(a.valores['estimativaPct']!)}%, com margem de ${inteiro(a.valores['margemPct']!)} pontos percentuais para mais ou para menos. Limite: ${inteiro(a.valores['limiarPct']!)}%.',
-      '${inteiro(a.valores['achados']!)} achados em vistoria simulada de ${inteiro(a.valores['amostraPct']!)}% das ruas.',
-      '${inteiro(a.valores['registrados']!)} pedidos registrados nos últimos 3 meses. Todos estes dados são sintéticos.',
+      'Sub-registro estimado: ${inteiro(a.valores['estimativaPct']!)}%, com margem de ${inteiro(a.valores['margemPct']!)} ${inteiro(a.valores['margemPct']!) == '1' ? 'ponto percentual' : 'pontos percentuais'} para mais ou para menos. Limite: ${inteiro(a.valores['limiarPct']!)}%.',
+      '${inteiro(a.valores['achados']!)} ${inteiro(a.valores['achados']!) == '1' ? 'achado' : 'achados'} em vistoria simulada de ${inteiro(a.valores['amostraPct']!)}% das ruas.',
+      '${inteiro(a.valores['registrados']!)} ${inteiro(a.valores['registrados']!) == '1' ? 'pedido registrado' : 'pedidos registrados'} nos últimos 3 meses. Todos estes dados são sintéticos.',
     ],
   };
   static String alertaConfiancaExplicacao(Alerta a) => switch (a.tipo) {
     TipoAlerta.picoDemanda || TipoAlerta.quedaRegistro =>
-      '${confianca(a.confianca)}. MAPE: ${inteiro(a.valores['mapePct']!)}% (arredondado). Até 8%: alta; até 15%: média; acima: baixa. Cai um nível se o desvio for menor que 2 vezes o RMSE, que dá mais peso aos erros grandes.',
+      '${confianca(a.confianca)}. MAPE: ${inteiro(a.valores['mapePct']!)}% (arredondado), média dos erros percentuais de cada mês no teste. Até 8%: alta; até 15%: média; acima: baixa. Os limites usam o valor sem arredondar. Cai um nível se o desvio for menor que 2 vezes o RMSE, que dá mais peso aos erros grandes.',
     TipoAlerta.chuvaForte =>
       '${confianca(a.confianca)}. A maior chance diária de chuva é ${inteiro(a.valores['probMaxPct']!)}%. A confiança é média a partir de 70% e baixa abaixo disso. Não indica certeza de chuva no distrito.',
     TipoAlerta.ocorrenciasCidadao =>
-      '${confianca(a.confianca)}. São ${inteiro(a.valores['quantidade']!)} ocorrências em 7 dias. A confiança é média com 5 ou mais e baixa com menos. Os relatos não são verificados.',
+      '${confianca(a.confianca)}. ${a.valores['quantidade'] == 1 ? 'É' : 'São'} ${inteiro(a.valores['quantidade']!)} ${a.valores['quantidade'] == 1 ? 'ocorrência' : 'ocorrências'} em 7 dias. A confiança é média com 5 ou mais e baixa com menos. Os relatos não são verificados.',
     TipoAlerta.subRegistro =>
       'Confiança baixa: estimativa de ${inteiro(a.valores['estimativaPct']!)}% baseada em vistoria amostral simulada. Dados sintéticos não confirmam problemas reais no distrito.',
   };
@@ -522,7 +527,7 @@ class Textos {
     TipoAlerta.quedaRegistro => 'Comparamos os registros do último mês com a previsão: (registrados / previstos - 1) vezes 100. O alerta aparece quando a queda atinge o limite. A previsão usa só o passado.',
     TipoAlerta.chuvaForte => 'Somamos a chuva prevista em 3 dias e comparamos com o limite. Selecionamos até 3 distritos com maior proporção de pedidos de boca de lobo, desde que ela seja de pelo menos 20%.',
     TipoAlerta.ocorrenciasCidadao => 'Contamos as ocorrências salvas neste aparelho no mesmo distrito nos últimos 7 dias. Ao atingir o limite, o app mostra um alerta para análise. Os relatos não são verificados.',
-    TipoAlerta.subRegistro => 'Estimados = achados / 0,10. Sub-registro p = 1 - registrados / estimados. Margem = 1,96 vezes a raiz de p(1-p) / achados. São estimativas com vistoria simulada, comparadas ao limite escolhido.',
+    TipoAlerta.subRegistro => 'Estimados = achados / 0,10. Sub-registro p = 1 - registrados / estimados. Margem = 1,96 x raiz(p(1-p)/achados). A margem aproxima a incerteza da amostra, sem cobertura comprovada: registros e achados vêm de processos separados. São estimativas com vistoria simulada, comparadas ao limite escolhido.',
   };
   static List<String> alertaSugestoes(TipoAlerta t) => switch (t) {
     TipoAlerta.picoDemanda => [
@@ -580,25 +585,25 @@ class Textos {
       'Descreva um problema de zeladoria no distrito. O registro fica neste aparelho e pode compor um alerta local; não é enviado a um órgão público.';
   static const privacidadeFormTitulo = 'Cuide dos seus dados';
   static const List<String> privacidadeFormItens = [
-    'Não informe nome, telefone ou e-mail.',
-    'Dados pessoais identificados na descrição e na referência são trocados por [removido].',
+    'Não escreva nome, contato nem endereço completo. A remoção automática pode falhar com nome ou endereço escrito de outro jeito.',
+    'E-mail, telefone, CPF, placa, nome após "meu nome é", "me chamo" ou "sou" e número após nome de rua, quando identificados na descrição e na referência, são trocados por [removido].',
     'O registro fica só neste aparelho. Você pode apagá-lo.',
   ];
   static const campoCategoria = 'Tipo de problema';
   static const campoDescricao = 'Descrição';
   static String campoDescricaoAjuda(int min) =>
-      'Conte o que aconteceu, com pelo menos $min caracteres e sem dados pessoais.';
+      'Conte o que aconteceu, com pelo menos $min ${min == 1 ? 'caractere' : 'caracteres'} e sem dados pessoais.';
   static const campoReferencia = 'Referência (opcional)';
   static const campoReferenciaAjuda =
       'Use um lugar conhecido, sem número de casa ou dados pessoais.';
   static const avisoDadoPessoal =
-      'O texto parece conter um dado pessoal. Ao salvar, o trecho identificado será trocado por [removido].';
+      'O texto parece conter dado pessoal. A remoção automática inclui nome após "meu nome é", "me chamo" ou "sou" e número após nome de rua, mas pode falhar com outra escrita. Só o trecho identificado vira [removido]. Não escreva nome, contato nem endereço completo.';
   static const registrarConsentimento =
-      'Concordo em registrar esta ocorrência de forma anônima.';
+      'Concordo em registrar esta ocorrência sem identificação pessoal.';
   static const registrarConsentimentoErro =
       'Marque o aceite para salvar a ocorrência.';
   static String registrarGatilho(int limiar) =>
-      'Com $limiar ocorrências no distrito em 7 dias, o app gera um alerta local para análise do gestor.';
+      'Com $limiar ${limiar == 1 ? 'ocorrência' : 'ocorrências'} no distrito em 7 dias, o app gera um alerta local para análise do gestor.';
   static const registrarBotao = 'Salvar ocorrência';
   static const marcadorRemovido = '[removido]';
   static const ocorrenciaSalvaTitulo = 'Ocorrência salva no aparelho';
@@ -610,13 +615,13 @@ class Textos {
   static const apagarOcorrencia = 'Apagar ocorrência';
   static const erroDescricaoVazia = 'Descreva o problema.';
   static String erroDescricaoCurta(int min, int atual) =>
-      'Use pelo menos $min caracteres. Você escreveu $atual.';
+      'Use pelo menos $min ${min == 1 ? 'caractere' : 'caracteres'}. Você escreveu $atual.';
   static String erroDescricaoLonga(int max) =>
-      'Use no máximo $max caracteres na descrição.';
+      'Use no máximo $max ${max == 1 ? 'caractere' : 'caracteres'} na descrição.';
   static const erroDescricaoSemPalavras =
       'Use palavras para descrever o problema.';
   static String erroReferenciaLonga(int max) =>
-      'Use no máximo $max caracteres na referência.';
+      'Use no máximo $max ${max == 1 ? 'caractere' : 'caracteres'} na referência.';
 
   static const ajustesTitulo = 'Ajustes';
   static const ajustesPerfilTitulo = 'Perfil de uso';
@@ -624,7 +629,7 @@ class Textos {
   static const ajustesDistritoTitulo = 'Meu distrito';
   static const ajustesTemaTitulo = 'Aparência';
   static String ajustesLimiaresResumo(Limiares l) =>
-      'Pico ${l.picoPercentual}%; queda ${l.quedaPercentual}%; chuva ${l.chuvaMm3Dias} mm/3 dias; ${l.ocorrencias7Dias} ocorrências/7 dias; sub-registro ${l.subRegistroPercentual}%.';
+      'Pico ${l.picoPercentual}%; queda ${l.quedaPercentual}%; chuva ${l.chuvaMm3Dias} mm/3 dias; ${l.ocorrencias7Dias} ${l.ocorrencias7Dias == 1 ? 'ocorrência' : 'ocorrências'}/7 dias; sub-registro ${l.subRegistroPercentual}%.';
   static const sobreDadosTitulo = 'Sobre os dados';
   static const sobreDadosResumo =
       'Fontes, cálculo das previsões e limites da análise.';
@@ -632,7 +637,8 @@ class Textos {
   static const List<String> privacidadeItens = [
     'Ocorrências, decisões e preferências ficam só neste aparelho, sem envio a órgãos públicos.',
     'Não pedimos nome ou contato. O código é aleatório e o horário é arredondado para a hora cheia.',
-    'Dados pessoais identificados na descrição e na referência são trocados por [removido]. Evite incluí-los.',
+    'E-mail, telefone, CPF, placa, nome após "meu nome é", "me chamo" ou "sou" e número após nome de rua, quando identificados na descrição e na referência, são trocados por [removido].',
+    'A remoção automática pode falhar com nome ou endereço escrito de outro jeito. Não escreva nome, contato nem endereço completo.',
     'O consentimento fica salvo com data. Você pode apagar todos os dados a qualquer momento.',
   ];
   static const apagarDadosBotao = 'Apagar todos os dados';
@@ -662,27 +668,28 @@ class Textos {
   static const limiaresSalvar = 'Salvar limites';
   static const limiaresPadrao = 'Voltar ao padrão';
   static String limiaresSalvos(int novos, int sairam, int total) =>
-      'Limites salvos. Novos: $novos; saíram: $sairam; ativos: $total.';
+      'Limites salvos. ${novos == 1 ? 'Novo' : 'Novos'}: $novos; ${sairam == 1 ? 'saiu' : 'saíram'}: $sairam; ${total == 1 ? 'ativo' : 'ativos'}: $total.';
 
   static const fontesTitulo = 'De onde vêm os dados';
   static List<String> fontes(int semente, int distritos, int meses) => [
-    'Zeladoria sintética, gerada com semente $semente: $distritos distritos e $meses meses, de nov/2024 a out/2026. Só os nomes são reais; população, renda e séries são simuladas.',
+    'Zeladoria sintética, gerada com semente $semente: $distritos ${distritos == 1 ? 'distrito' : 'distritos'} e $meses ${meses == 1 ? 'mês' : 'meses'}, de nov/2024 a out/2026. Só os nomes são reais; população, renda e séries são simuladas.',
     'Clima real da API Open-Meteo, sem chave: 30 dias anteriores e 7 previstos. Sem rede, usa dados salvos ou a cópia real de 16/11/2026 incluída no app.',
     'Ocorrências registradas neste aparelho por quem usa o app. Não são verificadas nem enviadas a órgãos públicos.',
   ];
   static const metricasTitulo = 'Como a previsão se saiu';
   static String metricasSubtitulo(int meses) =>
-      'Teste de $meses meses, de abril a setembro de 2026, usando apenas o passado de cada mês.';
+      'Teste de $meses ${meses == 1 ? 'mês' : 'meses'}, de abril a setembro de 2026, usando apenas o passado de cada mês.';
   static const metricaMae = 'Erro médio em pedidos (MAE)';
   static const metricaMape = 'Erro percentual (MAPE)';
   static String metricaMelhor(String nome) => 'Menor erro: $nome';
   static String metricaPior(String nome) => 'Maior erro: $nome';
   static const metricasComoLer =
-      'MAE é o erro médio em pedidos por mês e distrito. MAPE expressa o erro em relação ao volume registrado. Quanto menores, melhor. No teste: 28,9 pedidos e 6,7%, sem garantia para meses futuros.';
+      'MAE é o erro médio em pedidos por mês e distrito. MAPE é a média dos erros percentuais de cada mês: o erro absoluto dividido pelos pedidos registrados, vezes 100. O MAPE geral reúne os meses e distritos do teste. Quanto menores, melhor. No teste: 28,9 pedidos e 7,2%, sem garantia para meses futuros.';
   static const comoAlertasTitulo = 'Como surgem os alertas';
   static const List<String> comoAlertas = [
     'Pico: registros do último mês pelo menos 20% acima do previsto, no padrão.',
     'Queda: registros pelo menos 25% abaixo do previsto, no padrão. Pode haver menos problemas ou menos registros.',
+    'Nos alertas de pico e queda, a confiança usa o MAPE, média dos erros percentuais de cada mês no teste: alta até 8%, média até 15% e baixa acima disso. Cai um nível se o desvio for menor que 2 vezes o RMSE.',
     'Chuva: pelo menos 40 mm em 3 dias, no padrão. Considera até 3 distritos com maior parcela de pedidos de boca de lobo, desde que ela seja de pelo menos 20%.',
     'Ocorrências: pelo menos 3 registros locais no mesmo distrito em 7 dias, no padrão. Não são verificados.',
     'Sub-registro: estimativa de pelo menos 60% sem registro, no padrão. Usa vistorias simuladas e tem confiança baixa. Os limites podem ser alterados em Ajustes.',
