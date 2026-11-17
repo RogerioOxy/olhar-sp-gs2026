@@ -108,17 +108,17 @@ Com os limites padrão, em 16/11/2026 havia oito alertas: picos de Grajaú, +54%
 
 Cada detalhe apresenta resumo, justificativa numérica e gráfico, confiança explicada, limitações, cálculo e sugestões para avaliação. O aviso “A decisão é de uma pessoa” acompanha essa leitura. O gestor pode registrar sua decisão, mas ela fica apenas no aparelho e não aciona atendimento.
 
-O recálculo também aparece durante o uso. No teste com pico em 10% e ocorrências em 1, salvar os limites gerou três novos alertas, totalizando 11, indicados por “Novos: 3” e pelo selo na aba Alertas. Quando uma ocorrência atinge o limite do distrito, o diálogo oferece “Ver alerta”. Isso demonstra uma atualização da análise, sem comunicação com equipes.
+O recálculo também aparece durante o uso. Os alertas de ocorrências são recalculados sozinhos quando uma ocorrência completa sete dias com o app aberto e ao voltar para o app. No teste com pico em 10% e ocorrências em 1, salvar os limites gerou três novos alertas, totalizando 11, indicados por “Novos: 3” e pelo selo na aba Alertas. Quando uma ocorrência atinge o limite do distrito, o diálogo oferece “Ver alerta”. Isso demonstra uma atualização da análise, sem comunicação com equipes.
 
 **Benefício social e limites.** O indicador social é a diferença de atendimentos por 10 mil habitantes entre alta e baixa renda. Na média dos últimos três meses, os valores exibidos são 24,8 e 15,9, com diferença de 9,0 por mês e queda de 3,4% ao mês nos últimos 12 meses. São resultados sintéticos; os valores apresentados estão arredondados.
 
 Se a previsão e o alerta de sub-registro ajudarem a orientar vistorias para quem registra pouco, essa diferença pode cair. A queda só é boa notícia se acontecer porque o atendimento da baixa renda subiu. Cair porque a alta renda perdeu atendimento não é melhora. Por isso, é preciso olhar a diferença junto com o valor da baixa renda. Essa é a métrica para acompanhar um possível benefício, não uma promessa. Um MAPE menor melhora a referência de demanda, mas sozinho não demonstra atendimento mais justo.
 
-As previsões não são confiáveis sem o histórico mínimo, diante de mudanças que o passado não representa ou quando o erro do distrito é alto. Também não se deve confiar em previsão de chuva vencida ou incompleta. Poucos registros podem distorcer a leitura da demanda. Ocorrências locais refletem somente quem usou aquele aparelho. O clima de um ponto pode divergir de outros bairros, e dados salvos podem estar desatualizados. As hipóteses de renda e da amostra também introduzem vieses. Por isso, os alertas precisam ser confrontados com avaliação humana do território.
+As previsões não são confiáveis sem o histórico mínimo, diante de mudanças que o passado não representa ou quando o erro do distrito é alto. Também não se deve confiar em previsão de chuva vencida ou incompleta. Poucos registros podem distorcer a leitura da demanda. Ocorrências locais refletem somente quem usou aquele aparelho. O clima de um ponto pode divergir de outros bairros, e dados salvos podem estar desatualizados. Sem internet, os “últimos 7 dias” de um dado salvo antigo são os sete dias antes da data em que ele foi baixado; a faixa no topo do painel mostra a data desse dado. As hipóteses de renda e da amostra também introduzem vieses. Por isso, os alertas precisam ser confrontados com avaliação humana do território.
 
 ## 7. Privacidade e inclusão
 
-O app não pede nome, telefone nem e-mail. Antes de salvar uma ocorrência, a anonimização troca os trechos identificados de e-mail, telefone, CPF, placa e número de casa por `[removido]`. Também identifica nome depois de “meu nome é”, “me chamo” ou “sou” e número depois de nome de rua: “Rua Alfa 123” vira “Rua Alfa [removido]”. A remoção é automática e pode falhar com nome ou endereço escrito de outro jeito. Por isso, não escreva nome, contato nem endereço completo. O registro recebe um código aleatório de 12 dígitos hexadecimais e horário arredondado para a hora cheia. O formulário avisa quando o texto parece conter dado pessoal.
+O app não pede nome, telefone nem e-mail. Antes de salvar uma ocorrência, a anonimização troca os trechos identificados de e-mail, telefone, CPF, placa e número de casa por `[removido]`. Também identifica nome depois de “meu nome é”, “me chamo” ou “sou” e número depois de nome de rua: “Rua Alfa 123” vira “Rua Alfa [removido]”. Números seguidos de “de”, “da” ou “do” no nome da rua ficam iguais, como em “Rua 25 de Março”, e “Sou morador”, “Sou vizinho” e “Sou estudante” não são tratados como nome; a remoção pode falhar com nome todo em minúsculas, como “sou joao da silva”, ou endereço escrito de outro jeito. Por isso, não escreva nome, contato nem endereço completo. O registro recebe um código aleatório de 12 dígitos hexadecimais e horário arredondado para a hora cheia. O formulário avisa quando o texto parece conter dado pessoal. Depois de salvar, o diálogo mostra o texto exatamente como ficou guardado, e a pessoa pode apagar a ocorrência na lista.
 
 Distrito e tipo são obrigatórios. A descrição precisa ter palavras e entre 15 e 280 caracteres. A referência aceita até 80 caracteres, e o aceite é obrigatório. Erros aparecem em vermelho. Limites dos alertas têm cinco campos numéricos com faixa validada.
 
@@ -201,7 +201,7 @@ A resposta do clima fica salva no aparelho. Sem internet, o app mostra o último
    flutter analyze
    ```
 
-A referência de qualidade do projeto é de 45 testes de unidade e widget passando e `flutter analyze` sem avisos. Esses testes cobrem regras e widgets; a limitação da checagem com leitor de tela está descrita na seção de inclusão.
+A referência de qualidade do projeto é de 47 testes de unidade e widget passando e `flutter analyze` sem avisos. Esses testes cobrem regras e widgets; a limitação da checagem com leitor de tela está descrita na seção de inclusão.
 
 Opcionalmente, com Python disponível, regenere o JSON com a mesma semente:
 
