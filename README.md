@@ -1,5 +1,7 @@
 # Olhar SP
 
+## 1. Cabeçalho
+
 <img src="assets/icone.png" width="120">
 
 Previsões e registros para cuidar dos distritos de São Paulo.
@@ -86,11 +88,11 @@ O gerador supõe mais problemas por habitante, menos registros e menos atendimen
 
 O clima é real, consultado na API pública Open-Meteo, sem chave. A consulta usa um ponto no centro de São Paulo, latitude -23,55 e longitude -46,63. Isso não representa a chuva de cada distrito. Combinar as fontes não transforma a série sintética de zeladoria em dado observado.
 
-**Previsão e avaliação.** Em `lib/domain/previsao.dart`, a previsão é o nível médio dos três meses anteriores, sem efeito sazonal, multiplicado pelo índice sazonal do mês previsto. O índice usa o total da cidade e somente meses anteriores à previsão. Há teste automatizado contra vazamento de futuro. O cálculo exige pelo menos 12 meses de histórico.
+**Previsão e avaliação.** Em `lib/domain/previsao.dart`, a previsão é o nível médio dos três meses anteriores, sem efeito sazonal, multiplicado pelo índice sazonal do mês previsto. O índice usa o total da cidade e somente meses anteriores à previsão. Um teste automatizado verifica se a previsão usa apenas meses anteriores. O cálculo exige pelo menos 12 meses de histórico.
 
 O backtest cobre seis meses, de abril a setembro de 2026. Cada previsão usa apenas o passado. O MAE médio é de 28,9 pedidos por mês por distrito. Ele expressa o tamanho médio do erro em pedidos. O MAPE geral é de 7,2%: a média dos erros percentuais de cada mês e distrito. Em cada ponto, dividimos o erro absoluto pelos pedidos registrados e multiplicamos por 100. Grajaú tem o menor MAPE, 4,0%, e Jardim Paulista o maior, 11,1%.
 
-A faixa do próximo mês usa mais ou menos 1,28 x RMSE do teste de seis meses. O RMSE dá mais peso a erros grandes. A faixa é uma heurística, uma aproximação que supõe erros parecidos com os do teste e mais ou menos simétricos. Foi pensada para cobrir perto de 80% nessas condições, mas a cobertura real não foi medida e não há garantia do resultado futuro. Outubro de 2026 é o mês avaliado pelos alertas e fica fora do backtest.
+A faixa do próximo mês usa mais ou menos 1,28 x RMSE do teste de seis meses. O RMSE dá mais peso a erros grandes. A faixa é uma aproximação que supõe erros parecidos com os do teste, mais ou menos simétricos. A ideia é cobrir perto de 80% dos casos, mas a cobertura real não foi medida. Outubro de 2026 é o mês avaliado pelos alertas e fica fora do backtest.
 
 **Regras dos alertas.** O arquivo `lib/domain/alertas.dart` recalcula os alertas quando mudam dados, limites ou ocorrências. Os padrões são:
 
@@ -102,7 +104,7 @@ A faixa do próximo mês usa mais ou menos 1,28 x RMSE do teste de seis meses. O
 | Ocorrências no distrito | Pelo menos três ocorrências locais no mesmo distrito em sete dias. Confiança média com cinco ou mais; caso contrário, baixa. |
 | Possível sub-registro | Estimativa de pelo menos 60%, sempre com confiança baixa. Usa a vistoria simulada para estimar problemas que não viraram registros. |
 
-O sub-registro é `1 - registrados / (achados na vistoria / 0,10)`. A margem dessa estimativa é `1,96 x raiz(p(1-p)/achados)`, em que `p` é o sub-registro estimado. Ela só aproxima a incerteza da amostra, sem cobertura comprovada, porque registros e achados vêm de processos separados. A extrapolação depende da amostra simulada e não permite afirmar quantos problemas existem de verdade.
+O sub-registro é `1 - registrados / (achados na vistoria / 0,10)`. A margem dessa estimativa é `1,96 x raiz(p(1-p)/achados)`, em que `p` é o sub-registro estimado. A margem é uma aproximação porque os registros e os achados vêm de processos separados. A extrapolação depende da amostra simulada e não permite afirmar quantos problemas existem de verdade.
 
 Com os limites padrão, em 16/11/2026 havia oito alertas: picos de Grajaú, +54%, e Penha, +47%, ambos com confiança alta; queda de Cidade Tiradentes, -34%; e cinco distritos de baixa renda com sub-registro entre 61% e 69%. Essa contagem é um retrato daquela data e configuração.
 
@@ -112,7 +114,7 @@ O recálculo também aparece durante o uso. Os alertas de ocorrências são reca
 
 **Benefício social e limites.** O indicador social é a diferença de atendimentos por 10 mil habitantes entre alta e baixa renda. Na média dos últimos três meses, os valores exibidos são 24,8 e 15,9, com diferença de 9,0 por mês e queda de 3,4% ao mês nos últimos 12 meses. São resultados sintéticos; os valores apresentados estão arredondados.
 
-Se a previsão e o alerta de sub-registro ajudarem a orientar vistorias para quem registra pouco, essa diferença pode cair. A queda só é boa notícia se acontecer porque o atendimento da baixa renda subiu. Cair porque a alta renda perdeu atendimento não é melhora. Por isso, é preciso olhar a diferença junto com o valor da baixa renda. Essa é a métrica para acompanhar um possível benefício, não uma promessa. Um MAPE menor melhora a referência de demanda, mas sozinho não demonstra atendimento mais justo.
+Se a previsão e o alerta de sub-registro ajudarem a orientar vistorias para quem registra pouco, essa diferença pode cair. A queda só indica melhora se o atendimento da baixa renda aumentar. Ler a diferença junto com o valor da baixa renda ajuda a acompanhar esse possível benefício, sem garantir que ele aconteça. Um MAPE menor melhora a referência de demanda, mas sozinho não demonstra atendimento mais justo.
 
 As previsões não são confiáveis sem o histórico mínimo, diante de mudanças que o passado não representa ou quando o erro do distrito é alto. Também não se deve confiar em previsão de chuva vencida ou incompleta. Poucos registros podem distorcer a leitura da demanda. Ocorrências locais refletem somente quem usou aquele aparelho. O clima de um ponto pode divergir de outros bairros, e dados salvos podem estar desatualizados. Sem internet, os “últimos 7 dias” de um dado salvo antigo são os sete dias antes da data em que ele foi baixado; a faixa no topo do painel mostra a data desse dado. As hipóteses de renda e da amostra também introduzem vieses. Por isso, os alertas precisam ser confrontados com avaliação humana do território.
 
@@ -126,7 +128,7 @@ Consentimento com data, perfil, distrito, tema, limites, ocorrências, decisões
 
 Cada gráfico e cartão de alerta tem descrição textual com `Semantics`. Cartões tocáveis de alertas, painéis e indicadores e linhas de distrito também expõem a ação de toque ao leitor de tela. Os botões têm área mínima de 48 dp. Há temas claro, escuro e alto contraste. Em telas largas, o layout usa grades de duas a quatro colunas.
 
-Os testes de widget verificam `meetsGuideline(androidTapTargetGuideline)`, `labeledTapTargetGuideline` e `textContrastGuideline` em celular 360x780 e tablet 800x1280. O teste com fonte em 200% agora abre os três painéis, o detalhe do distrito e o detalhe do alerta, sem quebra de layout. Um teste de semântica confirma que o cartão de alerta é exposto como botão com ação de toque. O emulador não tem TalkBack instalado. A checagem de leitor de tela foi feita pelos testes de semântica, sem validação manual com TalkBack.
+Os testes de widget verificam `meetsGuideline(androidTapTargetGuideline)`, `labeledTapTargetGuideline` e `textContrastGuideline` em celular 360x780 e tablet 800x1280. O teste com fonte em 200% abre os três painéis, o detalhe do distrito e o detalhe do alerta, sem quebra de layout. Um teste de semântica confirma que o cartão de alerta é exposto como botão com ação de toque. O emulador não tem TalkBack instalado. A checagem de leitor de tela foi feita pelos testes de semântica, sem validação manual com TalkBack.
 
 ## 8. Tecnologias e decisões técnicas
 
@@ -168,16 +170,16 @@ A resposta do clima fica salva no aparelho. Sem internet, o app mostra o último
 
 É necessário ter Flutter 3.47.2, Dart 3.13.2, Android SDK e um emulador ou celular Android disponível.
 
-1. Clone o repositório, substituindo o marcador pelo endereço do projeto:
+1. Clone o repositório:
 
    ```bash
    git clone https://github.com/RogerioOxy/olhar-sp-gs2026.git
    ```
 
-2. Entre na pasta criada pelo clone. Ela tem o nome do repositório; ajuste o comando se o repositório tiver outro nome:
+2. Entre na pasta criada pelo clone:
 
    ```bash
-   cd olhar-sp
+   cd olhar-sp-gs2026
    ```
 
 3. Instale as dependências:
