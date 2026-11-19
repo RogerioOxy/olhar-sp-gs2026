@@ -213,7 +213,7 @@ Para instalar diretamente, o APK `olhar-sp-v1.0.0.apk` está na aba Releases do 
 
 ## 10. Vídeo
 
-[LINK DO VÍDEO]
+https://www.youtube.com/watch?v=Yk234XKgX8w
 
 ## 11. Licença
 
